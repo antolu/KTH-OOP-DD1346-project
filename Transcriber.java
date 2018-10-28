@@ -5,7 +5,6 @@ import java.lang.String;
 import javax.xml.bind.DatatypeConverter;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -45,9 +44,25 @@ public class Transcriber {
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
                 Element text = (Element) message.getElementsByTagName("text").item(0);
+                if (text.getElementsByTagName("encrypted").item(0) != null) {
+                    // Handle the encryption, <encrpyted type ="" key =""></encrypted>
+                }
                 String color = text.getAttribute("color");
                 return new Message(text.getTextContent(), color);
             }
+            else if (message.getTagName() == "request") {
+                // YAY a new connection! <request>Hello!</reply>
+            }
+            else if (message.getTagName() == "keyrequest") {
+                // <keyrequest type="">Something</keyrequest>
+            }
+            else if (message.getTagName() == "filerequest") {
+                // Handle the file request, <filerequest name="" size="" type="" key=""></filerequest>
+            }
+            else if (message.getTagName() == "fileresponse") {
+                // Handle it. <fileresponse reply="" port=""></fileresponse>
+            }
+            // Also need to handle <message><disconnect /></message>
             return new Message(errorMsg);
         } catch(Exception e) {
             e.printStackTrace();
@@ -55,7 +70,11 @@ public class Transcriber {
         }
     }
 
-    private static String interpretInlineXML(String input) {
+    private static String decodeHTML(String input) {
+        return input;
+    }
+
+    private static String encodeHTML(String input) {
         return input;
     }
 
