@@ -21,10 +21,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        String message = getMessage();
+        new StartFrame();
+        // String message = getMessage();
 
-        Message parsedMessage = Transcriber.parse(message);
+        // Message parsedMessage = Transcriber.parse(message);
 
-        System.out.println(parsedMessage);
+        // System.out.println(parsedMessage);
     }
 }
