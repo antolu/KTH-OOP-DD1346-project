@@ -1,14 +1,27 @@
+
+/**
+ * Encapsulates the information of an incoming message compactly
+ * and makes the information easily accessible by other methods.
+ */
 public class Message {
     private String message;
-    private String color = "";
+    private String color = "000000";
     private String time;
     private String type = "msg";
     private Boolean containsStyling = false;
 
+    /**
+     * Constructs only a simple message with a string.
+     */
     public Message(String message) {
         this.message = message;
     }
 
+    /**
+     * Constructs a message with text and color of text.
+     * @param message The text message.
+     * @param color The color of the message.
+     */
     public Message(String message, String color) {
         this(message);
         this.color = color;

@@ -13,21 +13,45 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.SAXException;
 
+/**
+ * Translates incoming messages in byte or string form to a fully readable
+ * message incapsulated in a Message object.
+ */
 public class Transcriber {
     private static final String errorMsg = "Incorrectly formatted message. Content omitted.";
 
+    /**
+     * Converts a byte array to a human readable string
+     * @param bytes The input data to be converted to a string
+     * @return The converted string.
+     */
     public static String byteToString(byte[] bytes) {
         return new String(bytes, Charset.forName("UTF-8"));
     }
 
+    /**
+     * Converts a string to a byte array.
+     * @param string The input data to be converted into a byte array.
+     * @return The converted byte array.
+     */
     public static byte[] stringToByte(String string) {
         return string.getBytes(Charset.forName("UTF-8"));
     }
 
+    /**
+     * Converts a byte array to a hexcode formatted string.
+     * @param bytes The input data to be converted to hex.
+     * @return The converted string.
+     */
     public static String byteToHex(byte[] bytes) {
         return DatatypeConverter.printHexBinary(bytes);
     }
 
+    /**
+     * Converts a hex formatted string to a byte array.
+     * @param hex The hex string to be converted.
+     * @return The converted byte array.
+     */
     public static byte[] hexToByte(String hex) {
         return DatatypeConverter.parseHexBinary(hex);
     }
