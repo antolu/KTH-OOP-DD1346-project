@@ -55,7 +55,12 @@ public class Transcriber {
     public static byte[] hexToByte(String hex) {
         return DatatypeConverter.parseHexBinary(hex);
     }
-
+    
+    /**
+     * Parses the received message and converts from string to object Message
+     * @param String msg, the received xml message 
+     * @return Message, the received message parsed
+     */
     public static Message parse(String msg) {
         msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + msg;
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
@@ -93,15 +98,33 @@ public class Transcriber {
             return new Message(errorMsg);
         }
     }
-
+    
+    /**
+     * Turns HTML names into symbols
+     * @param String input, received message with HTML names 
+     * @return String, message to be displayed
+     */
     private static String decodeHTML(String input) {
         return input;
     }
-
+    
+    /**
+     * Turns symbols into HTML names in a message to be sent
+     * @param String input, message written in GUI
+     * @return String, message to be sent with HTML names
+     */
     private static String encodeHTML(String input) {
         return input;
     }
 
+    /**
+     * Constructs a message with the appropriate xml-tags
+     * @param msg, string with the content of the message to be sent
+     * @param color, string with the desired color of the message
+     * @param encryptionType, string with the desired encryption type, if any
+     * @param encryptionKey, string with the key to the selected crypt
+     * @return String, message to be sent with all needed xml-tags
+     */
     public static String composeMessage(String msg, String color, String encryptionType, String encryptionKey) {
         return msg;
     }
