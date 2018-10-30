@@ -27,6 +27,7 @@ public class ChatWindow extends JEditorPane {
     /** The page to be displayed */
     private Document messagesPage;
     private Element body;
+    private Element table;
     private Transformer transformer;
 
     /** A list of all the received messages */
@@ -39,6 +40,25 @@ public class ChatWindow extends JEditorPane {
         Element html = messagesPage.createElement("html");
         body = messagesPage.createElement("body");
         body.setTextContent("Yay!");
+
+        /* Message part of the HTML page */
+        table = messagesPage.createElement("table");
+        table.setAttribute("style", "width:100%");
+        Element tr = messagesPage.createElement("tr");
+        Element col1 = messagesPage.createElement("td");
+        col1.setAttribute("width", "15%");
+        Element col2 = messagesPage.createElement("td");
+        col2.setAttribute("width", "70%");
+        Element col3 = messagesPage.createElement("td");
+        col3.setAttribute("width", "15%");
+        col1.setTextContent("Anton");
+        col2.setTextContent("sent this message");
+        col3.setTextContent("Hai Elisa");
+        tr.appendChild(col1);
+        tr.appendChild(col2);
+        tr.appendChild(col3);
+        table.appendChild(tr);
+        body.appendChild(table);
 
         messagesPage.appendChild(html);
         Element htmlNode = messagesPage.getDocumentElement();
@@ -57,17 +77,12 @@ public class ChatWindow extends JEditorPane {
         transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, doctype.getPublicId());
         transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doctype.getSystemId());
 
-        /* Convert document to human readable string */
-        StringWriter writer = new StringWriter();
-        DOMSource domSource = new DOMSource(messagesPage);
-        StreamResult result = new StreamResult(writer);
-        transformer.transform(domSource, result);
-        System.out.println(writer.toString());
+        String HTML = getHTMLAsString();
 
         setPreferredSize(new Dimension(400,300));
 
         setEditorKit(new HTMLEditorKit());
-        setText(writer.toString());
+        setText(HTML);
     }
 
     /**
@@ -87,5 +102,15 @@ public class ChatWindow extends JEditorPane {
     public void addMessage(Message msg) {
         // Generate new HTML
         // setText(String the new html stream.toString())
+    }
+
+    private String getHTMLAsString() throws Exception {
+        /* Convert document to human readable string */
+        StringWriter writer = new StringWriter();
+        DOMSource domSource = new DOMSource(messagesPage);
+        StreamResult result = new StreamResult(writer);
+        transformer.transform(domSource, result);
+        System.out.println(writer.toString());
+        return writer.toString();
     }
 }
