@@ -1,9 +1,16 @@
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 public class FileHandler{
 	
 	/**
 	 * if a file-progress already is taking place
 	 */
-	public volatile boolean isRunning = false; 
+	public volatile boolean isRunning= false; 
+	public volatile boolean requestAnswered = false; 
+	private Socket socket; 
+	
+	public Thread t;
 	
 	public FileHandler() {
 		
@@ -16,7 +23,8 @@ public class FileHandler{
 	 * @param message, the accompaning message
 	 * @param reply, yes/no (accept/decline the file request
 	 */
-	private static void SendResponse(Socket socket, String message, String reply) {
+	private static void SendResponse(Socket inSocket, String message, String reply) {
+		socket = inSocket;
 	 //	socket.write(reply+message);
 	}
 	
@@ -48,8 +56,39 @@ public class FileHandler{
 	 */
 	public void sendFileRequest(String message, int port, File file, String encr, String key, User user) {
 		
-		//Create thread, count down 60 sec. call displayQueryError, return if reach zero, 
-		//isRunning = false;
+		username = User.getName();
+		
+		t = new Thread(username){
+            public void run(){
+               	int countDown = 60;
+               	isRunning = true;
+               	requestAnswered = false;
+               	
+                while(true){
+                    	
+                	if(countDown<=0){
+                		displayQueryError();
+                    	//isRunning = false;
+                        return;
+                    }
+                	if(requestAnswered==true) {
+                		isRunning=false;
+                		return;
+                	}
+
+                    countDown--;
+
+                    try{
+                    	sleep(1000);
+                    }catch(InterruptedException e){
+                    	throw new RuntimeException(e);
+                    }
+                }
+            }       
+		};
+		
+		t.start();
+		
 		
 	}
 	
@@ -62,14 +101,43 @@ public class FileHandler{
 		
 	}
 	
+	public boolean getRunningStatus() {
+		return isRunning;
+	}
+	
+	
 	/**
 	 * Called when a response is received. Sends file or shut socket down
 	 * 
 	 * @param response, 
 	 */
 	public void handleResponse(String response) {
-		// if response is yes: send file
-		// if response is no: socket.close() and pop up window, unable to send
+		
+		requestAnswered = true;
+		//all the things used as file,socket etc needs to be saved somewhere before
+		if(response=="yes") {
+			showFileTransferProgress();
+			byte [] byteArray  = new byte [(int)file.length()];
+	        fInputStream = new FileInputStream(file);
+	        bInputStream = new BufferedInputStream(fInputStream);
+	        bInputStream.read(byteArray,0,byteArray.length);
+	        OutputStream os = socket.getOutputStream();
+	        os.write(byteArray,0,byteArray.length);
+	        os.flush();
+		}
+		else {
+			socket.close();
+			 // create a jframe
+		    JFrame requestDialog = new JFrame("JOptionPane showMessageDialog example");
+		    
+		    // show a joptionpane dialog using showMessageDialog
+		    JOptionPane.showMessageDialog(requestDialog,
+		        "Your request to send file was denied");
+		    
+		    //exit
+		    }
+		}
+
 	}
 	
 	
