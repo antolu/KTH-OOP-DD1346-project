@@ -2,13 +2,13 @@
 /**
  * Base class for all types of incoming messages. Encapsulates information.
  */
-public class Message {
+public class Query {
     private String message;
 
     /**
      * Constructs only a simple message with a string.
      */
-    public Message(String message) {
+    public Query(String message) {
         this.message = message;
     }
 

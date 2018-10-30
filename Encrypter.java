@@ -3,6 +3,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class Encrypter {
+    public static final String[] SUPPORTED_ENCRYPTIONS = {"AES"};
+
     public static byte[] encrypt(String type, String key, byte[] toEncrypt) {
         if (type.equals("caesar"))
             return encryptCaesar(key, toEncrypt);
