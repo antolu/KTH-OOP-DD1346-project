@@ -3,7 +3,7 @@ import java.net.ServerSocket;
 /** Basic struct class to encapsulate initial information from 
  * StartFrame to the chat backend.
  */
-public class Struct {
+public class ourStruct {
     private int port;
     private String name;
     private Boolean isServer;
@@ -16,7 +16,7 @@ public class Struct {
      * @param isServer If this chat is a server or a client.
      * @param serverSocket The initialized server socket.
      */
-    public Struct(int port, String name, Boolean isServer, ServerSocket serverSocket) {
+    public ourStruct(int port, String name, Boolean isServer, ServerSocket serverSocket) {
         this.port = port;
         this.name = name;
         this.isServer = isServer;
