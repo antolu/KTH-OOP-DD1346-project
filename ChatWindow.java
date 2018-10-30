@@ -1,9 +1,11 @@
 import java.util.List;
 
 import javax.swing.JEditorPane;
+import javax.swing.text.html.HTMLEditorKit;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.Node;
 
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -14,6 +16,8 @@ import java.io.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
+
+import java.awt.Dimension;
 
 /**
  * Customized JEditorPane that can display incoming chat messages
@@ -28,34 +32,42 @@ public class ChatWindow extends JEditorPane {
     /** A list of all the received messages */
     private List<Message> messages;
 
-    public ChatWindow() throws ParserConfigurationException, TransformerConfigurationException {
+    public ChatWindow() throws Exception {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         messagesPage = dBuilder.newDocument();
         Element html = messagesPage.createElement("html");
-        // body = html.createElement("body");
+        body = messagesPage.createElement("body");
+        body.setTextContent("Yay!");
+
+        messagesPage.appendChild(html);
+        Element htmlNode = messagesPage.getDocumentElement();
+        htmlNode.appendChild(body);
 
         /* Create transformer for outputting */
         TransformerFactory tFactory = TransformerFactory.newInstance();
         transformer = tFactory.newTransformer();
+
+        /* Set formatting to HTML */
+        DOMImplementation domImpl = dBuilder.getDOMImplementation();
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        DOMImplementation domImpl = dBuilder.getDOMImplementation();
-        DocumentType doctype = domImpl.createDocumentType("doctype", "html", "hello");
+        DocumentType doctype = domImpl.createDocumentType("doctype", "", "");
         transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, doctype.getPublicId());
         transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, doctype.getSystemId());
 
-        try {
-            StringWriter writer = new StringWriter();
-            DOMSource domSource = new DOMSource(messagesPage);
-            StreamResult result = new StreamResult(writer);
-            transformer.transform(domSource, result);
-            System.out.println(writer.toString());
-        } catch(TransformerException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        /* Convert document to human readable string */
+        StringWriter writer = new StringWriter();
+        DOMSource domSource = new DOMSource(messagesPage);
+        StreamResult result = new StreamResult(writer);
+        transformer.transform(domSource, result);
+        System.out.println(writer.toString());
+
+        setPreferredSize(new Dimension(400,300));
+
+        setEditorKit(new HTMLEditorKit());
+        setText(writer.toString());
     }
 
     /**
@@ -73,6 +85,7 @@ public class ChatWindow extends JEditorPane {
      * @param msg The message to be added.
      */
     public void addMessage(Message msg) {
-
+        // Generate new HTML
+        // setText(String the new html stream.toString())
     }
 }
