@@ -65,4 +65,16 @@ public class Message {
     public String toString() {
         return message;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Message))
+            return false;
+        return ((Message) obj).toString().equals(message);
+    }
+
+    @Override
+    public int hashCode() {
+        return time.hashCode() * message.hashCode();
+    }
 }

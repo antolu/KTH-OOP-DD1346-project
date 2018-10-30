@@ -1,7 +1,13 @@
+import java.net.Socket;
+
+/**
+ * A custom class encapsulating a socket client. One instance of this class per
+ * connection. 
+ */
 public class SocketClient{
 	
 	
-	Socket myClient;
+	private Socket myClient;
 	
 	/**
 	 * Constructor that gets a "pointer" to the backend, and the socket that was initialized in the backend
@@ -28,10 +34,20 @@ public class SocketClient{
 	
 	/**@param
 	 * Where the socket sends messages 
-	 * @param String msg, the message to be sent 
+	 * @param msg, the message to be sent 
 	 */
 	public void Send(String msg) {
 		
-	}
-	
+    }
+    
+    public String getSocketID() {
+        return myClient.getRemoteSocketAddress().toString();
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SocketClient))
+            return false;
+        return ((SocketClient) obj).getSocketID().equals(myClient.getRemoteSocketAddress().toString());
+    }
 }
