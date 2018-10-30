@@ -1,20 +1,16 @@
-
 /**
- * Encapsulates the information of an incoming message compactly
- * and makes the information easily accessible by other methods.
+ * Basic class encapsulating a chat message and formatting.
  */
-public class Message {
-    private String message;
+public class Message extends Query {
     private String color = "000000";
     private String time;
-    private String type = "msg";
-    private Boolean containsStyling = false;
 
     /**
-     * Constructs only a simple message with a string.
+     * Constructs a message without color.
+     * @param message The text message. 
      */
     public Message(String message) {
-        this.message = message;
+        super(message);
     }
 
     /**
@@ -27,19 +23,6 @@ public class Message {
         this.color = color;
     }
 
-    public Message(String message, String color, String type, Boolean containsStyling) {
-        this(message, color);
-        this.type = type;
-        this.containsStyling = containsStyling;
-    }
-
-    /**
-     * @return the message
-     */
-    public String getMessage() {
-        return message;
-    }
-
     /**
      * @return the color
      */
@@ -48,33 +31,21 @@ public class Message {
     }
 
     /**
-     * @return the type
+     * @return the time
      */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * @return the containsStyling
-     */
-    public Boolean getContainsStyling() {
-        return containsStyling;
+    public String getTime() {
+        return time;
     }
 
     @Override
     public String toString() {
-        return message;
+        return super.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
         if(!(obj instanceof Message))
             return false;
-        return ((Message) obj).toString().equals(message);
-    }
-
-    @Override
-    public int hashCode() {
-        return time.hashCode() * message.hashCode();
+        return ((Message) obj).getMessage().equals(getMessage());
     }
 }
