@@ -12,6 +12,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 
 import org.xml.sax.SAXException;
+import java.time.format.DateTimeFormatter;  
+import java.time.LocalDateTime;  
 
 /**
  * Translates incoming messages in byte or string form to a fully readable
@@ -19,6 +21,7 @@ import org.xml.sax.SAXException;
  */
 public class Transcriber {
     private static final String errorMsg = "Incorrectly formatted message. Content omitted.";
+    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * Converts a byte array to a human readable string
@@ -61,7 +64,7 @@ public class Transcriber {
      * @param String msg, the received xml message 
      * @return Message, the received message parsed
      */
-    public static Message parse(String msg) {
+    public static Query parse(String msg) {
         msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + msg;
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
 
@@ -73,22 +76,50 @@ public class Transcriber {
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
                 Element text = (Element) message.getElementsByTagName("text").item(0);
+                String textMessage = text.getTextContent();
+
                 if (text.getElementsByTagName("encrypted").item(0) != null) {
-                    // Handle the encryption, <encrpyted type ="" key =""></encrypted>
+                    NodeList childNodes = text.getChildNodes();
+
+                    for (int i = 0; i < childNodes.getLength(); i++) {
+                        Element node = (Element) childNodes.item(i);
+                        String encryptionType = node.getAttribute("type");
+                        String encryptionKey = node.getAttribute("key");
+                        textMessage += Encrypter.decrypt(encryptionType, encryptionKey, stringToByte(node.getTextContent()));
+                    }
                 }
+
                 String color = text.getAttribute("color");
-                return new Message(text.getTextContent());
+                String time = dtf.format(LocalDateTime.now());
+
+                return new Message(decodeHTML(textMessage), color, time, message.getAttribute("name"));
             }
             else if (message.getTagName() == "request") {
-                // YAY a new connection! <request>Hello!</reply>
+                String textMessage = message.getTextContent();
+                String name = message.getAttribute("name");
+
+                return new ConnectionRequest(textMessage, name);
             }
             else if (message.getTagName() == "keyrequest") {
+                String textMessage = message.getTextContent();
+                String encryptionType = message.getAttribute("type");
+
+                return new KeyRequest(textMessage, encryptionType);
                 // <keyrequest type="">Something</keyrequest>
             }
             else if (message.getTagName() == "filerequest") {
+                String textMessage = decodeHTML(message.getTextContent());
+                String filesize = message.getAttribute("size");
+                String filename = message.getAttribute("name");
+                String encryptionType = message.getAttribute("type");
+                String encryptionKey = message.getAttribute("key");
+
+                return new FileRequest(textMessage, filename, filesize, encryptionType, encryptionKey);
                 // Handle the file request, <filerequest name="" size="" type="" key=""></filerequest>
             }
             else if (message.getTagName() == "fileresponse") {
+                String textMessage = decodeHTML(message.getTextContent());
+
                 // Handle it. <fileresponse reply="" port=""></fileresponse>
             }
             // Also need to handle <message><disconnect /></message>
@@ -105,6 +136,10 @@ public class Transcriber {
      * @return String, message to be displayed
      */
     private static String decodeHTML(String input) {
+        input.replaceAll("&quot", "\"");
+        input.replaceAll("&amp", "&");
+        input.replaceAll("&lt", "<");
+        input.replaceAll("&gt", ">");
         return input;
     }
     
@@ -114,6 +149,10 @@ public class Transcriber {
      * @return String, message to be sent with HTML names
      */
     private static String encodeHTML(String input) {
+        input.replaceAll("\"", "&quot");
+        input.replaceAll("&", "&amp");
+        input.replaceAll("<", "&lt");
+        input.replaceAll(">", "&gt");
         return input;
     }
 
