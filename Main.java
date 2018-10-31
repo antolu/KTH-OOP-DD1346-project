@@ -1,6 +1,8 @@
 import java.io.*;
 import java.util.*;
 
+import java.net.Socket;
+
 import javax.swing.JFrame;
 
 public class Main {
@@ -24,21 +26,27 @@ public class Main {
 
     public static void main(String[] args) {
         // // Test ChatWindow
-        try {
-            JFrame frame = new JFrame();
-            ChatWindow chatWindow = new ChatWindow();
-            frame.getContentPane().add(chatWindow);
+        // try {
+        //     JFrame frame = new JFrame();
+        //     // ChatWindow chatWindow = new ChatWindow();
+        //     // frame.getContentPane().add(chatWindow);
+        //     User user = new User("Anton", "ID", new Socket());
+        //     ChatPane chatPane = new ChatPane(user, frame);
             
-            frame.pack();
-            frame.setVisible(true);
+        //     frame.add(chatPane);
 
-            Thread.sleep(4000);
-            Message msg = new Message("Eta 09.00", "0000FF", "08:46", "Elisabet");
-            chatWindow.addMessage(msg);
-        } catch(Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        //     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //     frame.pack();
+        //     frame.setVisible(true);
+
+        //     // Thread.sleep(4000);
+        //     // Message msg = new Message("Eta 09.00", "0000FF", "08:46", "Elisabet");
+        //     // chatWindow.addMessage(msg);
+        // } catch(Exception e) {
+        //     e.printStackTrace();
+        //     System.exit(1);
+        // }
 
 
         // new StartFrame();
