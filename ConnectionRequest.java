@@ -1,7 +1,7 @@
 /**
  * Basic class encapsulating information from a new connection request.
  */
-public class ConnectionRequest {
+public class ConnectionRequest extends Query {
     private String name;
 
     /**

@@ -6,6 +6,7 @@ public class Encrypter {
     public static final String[] SUPPORTED_ENCRYPTIONS = {"AES"};
 
     public static byte[] encrypt(String type, String key, byte[] toEncrypt) {
+        try {
         if (type.equals("caesar"))
             return encryptCaesar(key, toEncrypt);
         else if (type.equals("blowfish")) 
@@ -16,9 +17,14 @@ public class Encrypter {
             return encryptRSA(key, toEncrypt);
         else 
             return toEncrypt;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toEncrypt;
+        }
     }
 
     public static byte[] decrypt(String type, String key, byte[] toDecrypt) {
+        try {
         if (type.equals("caesar"))
             return decryptCaesar(key, toDecrypt);
         else if (type.equals("blowfish")) 
@@ -29,6 +35,10 @@ public class Encrypter {
             return decryptRSA(key, toDecrypt);
         else 
             return toDecrypt;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toDecrypt;
+        }
     }
     
     private static byte[] decryptCaesar(String key, byte[] toDecrypt) {
@@ -39,12 +49,12 @@ public class Encrypter {
         return toDecrypt;
     }
 
-    private static byte[] decryptAES(String key, byte[] toDecrypt) {
+    private static byte[] decryptAES(String key, byte[] toDecrypt) throws Exception {
         SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES");
 
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        return cipher.doFinal(plainText);
+        return cipher.doFinal(toDecrypt);
     }
 
     private static byte[] decryptRSA(String key, byte[] toDecrypt) {
@@ -59,12 +69,12 @@ public class Encrypter {
         return toEncrypt;
     }
 
-    private static byte[] encryptAES(String key, byte[] toEncrypt) {
+    private static byte[] encryptAES(String key, byte[] toEncrypt) throws Exception {
         SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES");
 
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        return cipher.doFinal(plainText);
+        return cipher.doFinal(toEncrypt);
     }
 
     private static byte[] encryptRSA(String key, byte[] toEncrypt) {
