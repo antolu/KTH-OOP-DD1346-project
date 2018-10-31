@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import java.util.HashMap;
 
 /**
  * The controller backend for the chat client. Supports
@@ -42,7 +43,7 @@ public class Backend implements ActionListener {
      * name, port, serversocket and whether the backend is started as server
      * or client.
      */
-    public Backend(Struct info) {
+    public Backend(ourStruct info) {
 
     }
 
