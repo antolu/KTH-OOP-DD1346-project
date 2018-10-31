@@ -38,7 +38,7 @@ public class ChatPane extends JPanel {
     /** Press here to open up a color selector */
     private JButton setColorButton;
     private JButton disconnectButton;
-    private JButton encryptButton;
+    private ToggleableButton encryptButton;
 
     /** The user messages are sent to */
     private User user;
@@ -58,7 +58,7 @@ public class ChatPane extends JPanel {
     /** Contains all the keys, each key corresponding to a type. <type,key>  */
     private HashMap<String, String> encryptionKeys;
 
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * Basic constructor.
@@ -91,7 +91,7 @@ public class ChatPane extends JPanel {
         setColorButton = new JButton();
         disconnectButton = new JButton();
         sendButton = new JButton();
-        encryptButton = new JButton();
+        encryptButton = new ToggleableButton("Encrypted", "Decrypted");
 
         sendFileButton.setText("Send file");
         setEncryptionButton.setText("Set encryption");
@@ -157,6 +157,9 @@ public class ChatPane extends JPanel {
             chatWindow.sentMessage(msg);
 
             // Actually send the message to the socket(s)
+            // if (encryptButton.getState()) {
+            //     // Create encrypted message
+            // }
             }
         });
 
@@ -177,6 +180,24 @@ public class ChatPane extends JPanel {
                         new EncryptionChooser(pane);
                     }
                 });
+            }
+        });
+
+        encryptButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                encryptButton.toggleState();
+            }
+        });
+
+        sendFileButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Open up the file selection dialog
+            }
+        });
+
+        disconnectButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                // Disconnect using backend or inform backend.
             }
         });
     }
