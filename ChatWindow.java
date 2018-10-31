@@ -20,8 +20,8 @@ import javax.xml.transform.stream.*;
 import java.awt.Dimension;
 
 /**
- * Customized JEditorPane that can display incoming chat messages
- * as a generated HTML page.
+ * Customized JEditorPane that can display incoming chat messages as a generated
+ * HTML page.
  */
 public class ChatWindow extends JEditorPane {
     /** The page to be displayed */
@@ -37,32 +37,37 @@ public class ChatWindow extends JEditorPane {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         messagesPage = dBuilder.newDocument();
+
+        /* Create all HTML elements */
         Element html = messagesPage.createElement("html");
         body = messagesPage.createElement("body");
-        body.setTextContent("Yay!");
+        Element tr = messagesPage.createElement("tr");
+        Element leftCol = messagesPage.createElement("td");
+        Element messageCol = messagesPage.createElement("td");
+        Element rightCol = messagesPage.createElement("td");
 
-        /* Message part of the HTML page */
+        /* Create table to display messages in */
         table = messagesPage.createElement("table");
         table.setAttribute("style", "width:100%");
-        Element tr = messagesPage.createElement("tr");
-        Element col1 = messagesPage.createElement("td");
-        col1.setAttribute("width", "15%");
-        Element col2 = messagesPage.createElement("td");
-        col2.setAttribute("width", "70%");
-        Element col3 = messagesPage.createElement("td");
-        col3.setAttribute("width", "15%");
-        col1.setTextContent("Anton");
-        col2.setTextContent("sent this message");
-        col3.setTextContent("Hai Elisa");
-        tr.appendChild(col1);
-        tr.appendChild(col2);
-        tr.appendChild(col3);
-        table.appendChild(tr);
-        body.appendChild(table);
 
+        /* Set formatting of table */
+        leftCol.setAttribute("width", "15%");
+        messageCol.setAttribute("width", "70%");
+        rightCol.setAttribute("width", "15%");
+
+        leftCol.setTextContent("***");
+        messageCol.setTextContent("Anton is now connected.");
+        rightCol.setTextContent("***");
+
+        /* Add all HTML elements to document */
         messagesPage.appendChild(html);
-        Element htmlNode = messagesPage.getDocumentElement();
-        htmlNode.appendChild(body);
+        // Element htmlNode = messagesPage.getDocumentElement();
+        html.appendChild(body);
+        body.appendChild(table);
+        table.appendChild(tr);
+        tr.appendChild(leftCol);
+        tr.appendChild(messageCol);
+        tr.appendChild(rightCol);
 
         /* Create transformer for outputting */
         TransformerFactory tFactory = TransformerFactory.newInstance();
@@ -79,38 +84,74 @@ public class ChatWindow extends JEditorPane {
 
         String HTML = getHTMLAsString();
 
-        setPreferredSize(new Dimension(400,300));
+        setPreferredSize(new Dimension(500, 300));
 
         setEditorKit(new HTMLEditorKit());
         setText(HTML);
     }
 
     /**
-     * Appends a new message to the internal messages list, and updates the 
-     * internal HTML page with the new message, and displays it.
+     * Appends a new message to the internal messages list, and updates the internal
+     * HTML page with the new message, and displays it.
+     * 
      * @param who Who the message corresponds to. Me or you.
      * @param msg The message to be added.
      */
-    public void addMessage(String who, Message msg) {
-
+    public void addMessage(Message msg) {
+        addTableElement(msg.getUsername(), msg.getMessage(), "", msg.getColor());
+        refreshWindow();
     }
 
     /**
      * Adds a new message that the local user sent.
+     * 
      * @param msg The message to be added.
      */
-    public void addMessage(Message msg) {
-        // Generate new HTML
-        // setText(String the new html stream.toString())
+    private void sentMessage(Message msg) {
+        /* Add new element to table */
+        addTableElement("", msg.getMessage(), msg.getUsername() + "\n" + msg.getTime(), msg.getColor());
+        refreshWindow();
     }
 
-    private String getHTMLAsString() throws Exception {
-        /* Convert document to human readable string */
-        StringWriter writer = new StringWriter();
-        DOMSource domSource = new DOMSource(messagesPage);
-        StreamResult result = new StreamResult(writer);
-        transformer.transform(domSource, result);
-        System.out.println(writer.toString());
-        return writer.toString();
+    private void addTableElement(String left, String message, String right, String color) {
+        Element tr = messagesPage.createElement("tr");
+        Element leftCol = messagesPage.createElement("td");
+        Element messageCol = messagesPage.createElement("td");
+        Element colorContent = messagesPage.createElement("font");
+        Element rightCol = messagesPage.createElement("td");
+
+        colorContent.setAttribute("color", color);
+        colorContent.setTextContent(message);
+
+        leftCol.setTextContent(left);
+        messageCol.appendChild(colorContent);
+        rightCol.setTextContent(right);
+
+        tr.appendChild(leftCol);
+        tr.appendChild(messageCol);
+        tr.appendChild(rightCol);
+
+        table.appendChild(tr);
+    }
+
+    private void refreshWindow() {
+        String newPage = getHTMLAsString();
+        setText(newPage);
+    }
+
+    private String getHTMLAsString() {
+        try {
+            /* Convert document to human readable string */
+            StringWriter writer = new StringWriter();
+            DOMSource domSource = new DOMSource(messagesPage);
+            StreamResult result = new StreamResult(writer);
+            transformer.transform(domSource, result);
+            System.out.println(writer.toString());
+            return writer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return "";
+        }
     }
 }
