@@ -50,6 +50,8 @@ public class Encrypter {
     }
 
     private static byte[] decryptAES(String key, byte[] toDecrypt) throws Exception {
+        // byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
+        // SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
         SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES");
 
