@@ -33,7 +33,7 @@ public class ChatWindow extends JEditorPane {
     /** A list of all the received messages */
     private List<Message> messages;
 
-    public ChatWindow() throws Exception {
+    public ChatWindow(User otherUser) throws Exception {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         messagesPage = dBuilder.newDocument();
@@ -56,7 +56,7 @@ public class ChatWindow extends JEditorPane {
         rightCol.setAttribute("width", "15%");
 
         leftCol.setTextContent("***");
-        messageCol.setTextContent("Anton is now connected.");
+        messageCol.setTextContent(otherUser.getName() + " is now connected.");
         rightCol.setTextContent("***");
 
         /* Add all HTML elements to document */
@@ -84,7 +84,7 @@ public class ChatWindow extends JEditorPane {
 
         String HTML = getHTMLAsString();
 
-        setPreferredSize(new Dimension(500, 300));
+        setPreferredSize(new Dimension(600, 400));
 
         setEditorKit(new HTMLEditorKit());
         setText(HTML);
@@ -107,7 +107,7 @@ public class ChatWindow extends JEditorPane {
      * 
      * @param msg The message to be added.
      */
-    private void sentMessage(Message msg) {
+    public void sentMessage(Message msg) {
         /* Add new element to table */
         addTableElement("", msg.getMessage(), msg.getUsername() + "\n" + msg.getTime(), msg.getColor());
         refreshWindow();
