@@ -207,23 +207,4 @@ public class ChatPane extends JPanel {
     public void addMessage(Message msg) {
         chatWindow.addMessage(msg);
     }
-
-    public void showEncryptionSelector() {
-
-    }
-
-    public void showColorPicker() {
-        
-    }
-
-    /**
-     * Handles all the button presses. For instance SendButton
-     * would invoke a Transcriber.composeMessage() and then send
-     * the composed message to the socket immediately. 
-     * @param e The ActionEvent. Not used.
-     */
-    public void actionPerformed(ActionEvent e) {
-
-    }
-
 }
