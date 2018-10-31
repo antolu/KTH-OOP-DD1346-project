@@ -77,7 +77,7 @@ public class Transcriber {
                     // Handle the encryption, <encrpyted type ="" key =""></encrypted>
                 }
                 String color = text.getAttribute("color");
-                return new Message(text.getTextContent(), color);
+                return new Message(text.getTextContent());
             }
             else if (message.getTagName() == "request") {
                 // YAY a new connection! <request>Hello!</reply>
