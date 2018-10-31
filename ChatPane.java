@@ -3,6 +3,7 @@ import javax.swing.JPanel;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import java.awt.Component;
 
 import java.awt.BorderLayout;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
  * on its own, sending messages of all forms to the correct socket.
  */
 public class ChatPane extends JPanel {
+    private JFrame mainFrame;
     /** The window that displays all the messages */
     private ChatWindow chatWindow;
     /** The textfield where you type your messages */
@@ -48,7 +50,7 @@ public class ChatPane extends JPanel {
     private List<Socket> sockets;
 
     /** The current color all msesages are sent with */
-    private String currentColor;
+    private volatile String currentColor = "";
     /** If this JPanel is visible in the GUI currently or not. */
     private Boolean isVisible;
     /** The current global enryption type */
@@ -63,9 +65,10 @@ public class ChatPane extends JPanel {
      * @param user The user this ChatPane should belong to
      * @param clientSocket The socket with which to communicate.
      */
-    public ChatPane(User user) throws Exception {
+    public ChatPane(User user, JFrame mainFrame) throws Exception {
         this.user = user;
         this.clientSocket = user.getClientSocket();
+        this.mainFrame = mainFrame;
 
         users = new ArrayList<>();
         sockets = new ArrayList<>();
@@ -75,7 +78,7 @@ public class ChatPane extends JPanel {
         encryptionKeys = new HashMap<>();
 
         createGUI();
-        addActionListeners();
+        addActionListeners(this);
     }
 
     private void createGUI() throws Exception {
@@ -146,7 +149,7 @@ public class ChatPane extends JPanel {
         this.add(rightPanel, BorderLayout.WEST);
     }
 
-    private void addActionListeners() {
+    private void addActionListeners(ChatPane pane) {
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             String message = msgField.getText();
@@ -154,6 +157,26 @@ public class ChatPane extends JPanel {
             chatWindow.sentMessage(msg);
 
             // Actually send the message to the socket(s)
+            }
+        });
+
+        setColorButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        new ColorChooser(pane);
+                    }
+                });
+            }
+        });
+
+        setEncryptionButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        new EncryptionChooser(pane);
+                    }
+                });
             }
         });
     }
@@ -165,6 +188,15 @@ public class ChatPane extends JPanel {
      */
     public String getPublicKey(String type) {
         return encryptionKeys.get(type);
+    }
+
+    public void updateColor(String color) {
+        currentColor = color;
+    }
+
+    public void updateEncryption(String type, String key) {
+        this.currentEncryptionType = type;
+        encryptionKeys.put(type, key);
     }
 
     /**
