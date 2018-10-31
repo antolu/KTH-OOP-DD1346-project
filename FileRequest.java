@@ -4,6 +4,8 @@
 public class FileRequest extends Query {
     private String fileName;
     private int fileSize;
+    private String encryptionType;
+    private String encryptionKey;
 
     /**
      * Generic encapsulation constructor.
@@ -11,10 +13,12 @@ public class FileRequest extends Query {
      * @param fileName The name of the file to be transferred.
      * @param fileSize The size of the file to be transferred.
      */
-    public FileRequest(String message, String fileName, int fileSize) {
+    public FileRequest(String message, String fileName, int fileSize, String encryptionType, String encryptionKey) {
         super(message);
         this.fileName = fileName;
         this.fileSize = fileSize;
+        this.encryptionType = encryptionType;
+        this.encryptionKey = encryptionKey;
     }
 
     /**
@@ -29,5 +33,23 @@ public class FileRequest extends Query {
      */
     public int getFileSize() {
         return fileSize;
+    }
+
+    /**
+     * @return the encryptionType
+     */
+    public String getEncryptionType() {
+        return encryptionType;
+    }
+
+    /**
+     * @return the encryptionKey
+     */
+    public String getEncryptionKey() {
+        return encryptionKey;
+    }
+
+    public Boolean isEncrypted() {
+        return !encryptionType.equals("");
     }
 }
