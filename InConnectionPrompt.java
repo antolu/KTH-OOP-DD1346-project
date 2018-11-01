@@ -3,6 +3,8 @@ import javax.swing.JFrame;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -29,6 +31,9 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
         acceptButton.setPreferredSize(new Dimension(80, 30));
         denyButton.setPreferredSize(new Dimension(80, 30));
 
+        acceptButton.addActionListener(this);
+        denyButton.addActionListener(this);
+
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.setPreferredSize(new Dimension(200, 50));
         buttonPanel.add(acceptButton);
@@ -36,12 +41,12 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
 
         JLabel text = new JLabel();
         text.setText("<html>" + user.getName() + " wants to connect to you. he says: <br> " + message + " <br> Do you accept? </html>");
-        text.setPreferredSize(new Dimension(200, 100));
+        text.setMaximumSize(new Dimension(200, 100));
+        text.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         frame = new JFrame("New incoming connection");
-        frame.setLayout(new BoxLayout(frame, BoxLayout.PAGE_AXIS));
 
-        setLayout(new BoxLayout(frame, BoxLayout.PAGE_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
         setPreferredSize(new Dimension(220, 160));
         add(text);
         add(buttonPanel);
@@ -52,6 +57,7 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
+        frame.setVisible(false);
         frame.dispose();
         if (e.getSource() == acceptButton) {
             backend.addConnectionAsServer(user);

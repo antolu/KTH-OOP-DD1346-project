@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.JOptionPane;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -52,6 +54,7 @@ public class Backend {
     private int port;
 
     private int connectedUsersCount = 0;
+    private volatile Boolean isRunning = true;
 
     private ChatPane chatPane;
 
@@ -65,13 +68,19 @@ public class Backend {
      */
     public Backend(ourStruct info) {
         Encrypter.initialize();
-        chatMap = new HashMap<>();
-        userMap = new HashMap<>();
+        chatMap = new HashMap<User, ChatPane>();
+        userMap = new HashMap<String, User>();
+        userList = new ArrayList<User>();
 
         myName = info.getName();
         port = info.getPort();
         serverSocket = info.getServerSocket();
 
+        createGUI();
+        waitForConnections(this);
+    }
+
+    private void createGUI() {
         frame = new JFrame("Chat");
         menuBar = new MenuBar(this);
 
@@ -162,12 +171,12 @@ public class Backend {
      */
     private void showConnectionRequest(Request request, User user) {
         if (connectedUsersCount >= MAX_CONNECTIONS) {
-            user.getClientSocket().send(Composer.composeRequestReply(backend.getMyName(), "no"));
+            user.getClientSocket().send(Composer.composeRequestReply(myName, "no"));
             JOptionPane.showMessageDialog(frame, "An user from " + user.getClientSocket().getSocketID() + " has tried to connect to you, but the max supported number of connections has been reached.");
         }
 
         connectedUsersCount++;
-        final Backend backendHere = backend;
+        final Backend backendHere = this;
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new InConnectionPrompt(request.getMessage(), user, backendHere);
@@ -246,8 +255,27 @@ public class Backend {
      * @param socket The client socket where the connection was established.
      * @param connectionRequest The message encapsulated in the connection request.
      */
-    private void addConnection(Socket socket, String connectionRequest) {
+    public void addNewConnection(Socket socket) {
+        SocketClient newSocket = new SocketClient(socket, this);
 
+        newSocket.start();
+    }
+
+    private void waitForConnections(Backend backend) {
+        new Thread(new Runnable()
+        {
+            public void run() {
+                while (!serverSocket.isClosed()) {
+                    try {
+                        Socket newSocket = serverSocket.accept();
+                        backend.addNewConnection(newSocket);
+                    } catch (IOException e) {
+                        System.err.print("Failed to accept connection.");
+                        // Do nothing
+                    }
+                }
+            }
+        }).start();
     }
 
     /**
