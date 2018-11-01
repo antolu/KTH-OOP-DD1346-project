@@ -54,12 +54,14 @@ public class SocketClient implements Runnable {
 
         try {
             String inputLine;
-            while ((inputLine = in.readLine()) != null) {
+            if ((inputLine = in.readLine()) != null) {
                 string.append(inputLine);
+                System.err.println(inputLine);
             }
         }
         catch (IOException e ) {
             // Do something maybe?
+            System.err.println("Something went wrong");
         }
 
         return string.toString();
@@ -70,7 +72,7 @@ public class SocketClient implements Runnable {
 	 * @param msg, the message to be sent 
 	 */
 	public void send(String msg) {
-        out.write(msg);
+        out.println(msg);
         out.flush();
     }
     
@@ -98,6 +100,7 @@ public class SocketClient implements Runnable {
         Query parsedMessage;
         while (clientSocket.isConnected()) {
             message = receive();
+            System.err.println("Received message " + message);
 
             parsedMessage = Transcriber.parse(message, this);
 
