@@ -41,6 +41,8 @@ public class MenuBar extends JPanel {
         disconnectButton.setPreferredSize(new Dimension(200, 30));
         newConnectionButton.setPreferredSize(new Dimension(200, 30));
 
+        disconnectButton.setEnabled(false); // Nothing to disconnect
+
         setLayout(new FlowLayout(FlowLayout.LEFT));
 
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
@@ -82,5 +84,13 @@ public class MenuBar extends JPanel {
                 }
             }
         });
+    }
+
+    public void enableDisconnectButton() {
+        disconnectButton.setEnabled(true);
+    }
+
+    public void disableDisconnectButton() {
+        disconnectButton.setEnabled(false);
     }
 }
