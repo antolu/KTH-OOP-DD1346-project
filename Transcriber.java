@@ -111,7 +111,7 @@ public class Transcriber {
                 Element node = (Element) childNodes.item(i);
                 String encryptionType = node.getAttribute("type");
                 String encryptionKey = node.getAttribute("key");
-                textMessage += byteToString(Encrypter.decrypt(encryptionType, encryptionKey, stringToByte(node.getTextContent())));
+                textMessage += byteToString(Encrypter.decrypt(encryptionType, encryptionKey, hexToByte(node.getTextContent())));
             }
         }
         else {
