@@ -19,14 +19,12 @@ public class StartFrame extends Observable implements ActionListener {
     private JTextField portField;
     private JButton okButton;
     private JTextField nameField;
-    private Main mainFrame;
 
     private String name;
     private int port;
     private ServerSocket serverSocket;
 
-    public StartFrame(Main mainFrame) {
-        this.mainFrame = mainFrame;
+    public StartFrame() {
         
         portField = new JTextField();
         portField.setPreferredSize(new Dimension(100, 25));
@@ -81,7 +79,7 @@ public class StartFrame extends Observable implements ActionListener {
         System.out.println("Port: " + port);
 
         // Return socket to parent
-        mainFrame.startMainFrame(new ourStruct(port, name, isServer, serverSocket));
+        Main.startMainFrame(new ourStruct(port, name, serverSocket));
     }
 
     private void showError(int port) {

@@ -57,7 +57,7 @@ public class Main {
         // System.out.println(parsedMessage);
     }
 
-    public void startMainFrame(ourStruct info) {
+    public static void startMainFrame(ourStruct info) {
         new Backend(info);
     }
 }
