@@ -27,19 +27,21 @@ public class StartFrame extends Observable implements ActionListener {
     public StartFrame() {
         
         portField = new JTextField();
-        // portField.setPreferredSize(new Dimension(100, 25));
+        portField.setPreferredSize(new Dimension(100, 25));
         nameField = new JTextField();
+        nameField.setPreferredSize(new Dimension(100, 25));
         okButton = new JButton();
         
         okButton.setText("OK");
 
         /* Add some descriptive text to the popup  */
-        JLabel nameLabel = new JLabel("Please enter your name.");
-        JLabel portLabel = new JLabel("Please enter the port number where a server socket should be opened");
+        JLabel nameLabel = new JLabel("<html>Please enter your name.</html>");
+        JLabel portLabel = new JLabel("<html>Please enter the port number where a server socket should be opened</html>");
 
         frame = new JFrame();
         JPanel contentPane = (JPanel) frame.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
+        contentPane.setPreferredSize(new Dimension(200, 150));
 
         okButton.addActionListener(this);
 
@@ -59,7 +61,7 @@ public class StartFrame extends Observable implements ActionListener {
         try {
             port = Integer.parseInt(portField.getText());
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(frame, "The specified port " + port + "is not an integer.");
+            JOptionPane.showMessageDialog(frame, "The specified port " + port + " is not an integer.");
             return;
         }
 
