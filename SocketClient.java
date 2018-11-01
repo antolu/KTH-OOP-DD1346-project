@@ -76,7 +76,7 @@ public class SocketClient implements Runnable {
         return clientSocket.getRemoteSocketAddress().toString();
     }
 
-    public void close() {
+    public void close() throws IOException {
         clientSocket.close();
     }
     
