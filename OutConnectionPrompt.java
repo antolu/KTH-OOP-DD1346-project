@@ -16,6 +16,7 @@ import java.awt.event.ActionEvent;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.lang.NumberFormatException;
+import java.io.IOException;
 
 import layout.SpringUtilities;
 
@@ -120,8 +121,16 @@ public class OutConnectionPrompt extends JPanel implements ActionListener {
 
         String message = messageField.getText();
 
-        frame.dispose();
+        frame.setVisible(false);
 
-        backend.newConnection(IP, port, message);
+        try {
+            backend.newClientConnection(IP, port, message);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(frame, "<html>A connection to " + IPField.getText() + ":" + portField.getText() + " could not be established. Try again later</html>");
+            frame.setVisible(true);
+            return;
+        }
+
+        frame.dispose();
     }    
 }

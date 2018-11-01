@@ -28,8 +28,9 @@ import java.io.IOException;
  * showing file transfer prompt, incoming request prompt.
  * <li> Handles buttonpresses from the menu bar, including setting up new
  * connections, disconnecting chats, changing username.
+ * </ul>
  */
-public class Backend implements ActionListener {
+public class Backend {
     private static final int MAX_CONNECTIONS = 3;
 
     private JFrame frame;
@@ -104,29 +105,29 @@ public class Backend implements ActionListener {
     }
 
     /**
-     * Internal method to process an incoming connection. Displays connection
-     * request prompt, appends socket and new user to corresponding lists, 
-     * creates new ChatPane if connection is accepted.
-     * @param socket The client socket where the connection was established.
-     * @param connectionRequest The message encapsulated in the connection request.
-     */
-    private void addConnection(Socket socket, String connectionRequest) {
-
-    }
-
-    /**
      * Observer-observable update method. called by the observables. 
      * Used for receiving new messages and queries from the client sockets.
      * @param socket The socket that called this method.
      * @param query The new message.
      */
-    public void receiveMessage(Query query) {
+    public void receiveMessage(Query query, SocketClient socket) {
         if (query instanceof Message) {
             Message msg = (Message) query;
             // chatPane.addMessage(msg);
         }
         else if (query instanceof Request) {
 
+        }
+        else if (query instanceof RequestResponse) {
+            RequestResponse response = (RequestResponse) query;
+            if (response.getReply().equals("yes")) {
+                addConnectionAsClient(response.getName(), socket);
+                // add socket
+            }
+            else {
+                socket.close();
+                JOptionPane.showMessageDialog(frame, "User at " + socket.getSocketID() + " denied your connection request.");
+            }
         }
         else if (query instanceof FileRequest) {
             
@@ -140,15 +141,6 @@ public class Backend implements ActionListener {
         else if (query.getMessage().equals("<disconnect />")) {
             // Disconnect the socket
         }
-    }
-
-    /**
-     * Generic ActionListener method. Handles buttonpresses of all 
-     * graphical elements, like menubar buttons, various prompts.
-     * @param e The ActionEvent.
-     */
-    public void actionPerformed(ActionEvent e) {
-
     }
 
     /**
@@ -174,11 +166,47 @@ public class Backend implements ActionListener {
     }
 
     /**
-     * Called when the user wants to set up a new connection as client.
-     * Displays a new window prompting for IP, port and message.
+     * Called by the New connection popup window. Sends a connection request 
+     * to the other end.
      */
-    public void newConnection(InetAddress IP, int port, String message) {
-        // Attempt to connect to the other user
+    public void newClientConnection(InetAddress IP, int port, String message) throws IOException {
+
+        Socket socket = new Socket(IP, port);
+
+        final SocketClient socketClient = new SocketClient(socket, this);
+        socketClient.send(Composer.composeRequest(message, myName));
+
+        /* Start receiving messages, including response to request */
+        socketClient.start();
+    }
+
+    /**
+     * Internal method to process an incoming connection. Displays connection
+     * request prompt, appends socket and new user to corresponding lists, 
+     * creates new ChatPane if connection is accepted.
+     * @param socket The client socket where the connection was established.
+     * @param connectionRequest The message encapsulated in the connection request.
+     */
+    private void addConnectionAsClient(String name, SocketClient socket) {
+        User newUser = new User(name, socket.getSocketID(), socket);
+
+        userList.add(newUser);
+
+        ChatPane newPane = new ChatPane(newUser);
+
+        chatMap.put(newUser, newPane);
+        tabbedPane.addTab(name, newPane);
+    }
+
+    /**
+     * Internal method to process an incoming connection. Displays connection
+     * request prompt, appends socket and new user to corresponding lists, 
+     * creates new ChatPane if connection is accepted.
+     * @param socket The client socket where the connection was established.
+     * @param connectionRequest The message encapsulated in the connection request.
+     */
+    private void addConnection(Socket socket, String connectionRequest) {
+
     }
 
     /**
