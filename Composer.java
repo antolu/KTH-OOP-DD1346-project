@@ -17,6 +17,22 @@ public class Composer {
         return sb.toString();
     }
 
+    public static String composeRequestReply(String name, String reply) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<request");
+            sb.append(" reply=\"");
+            sb.append(reply);
+            sb.append("\"");
+
+            sb.append(" name=\"");
+            sb.append(name);
+            sb.append("\"");
+        sb.append(">");
+        sb.append("</request>");
+
+        return sb.toString();
+    }
+
     public static String composeMessage(String message, String color, String encryptionType, String encryptionKey, String name) {
         StringBuilder sb = new StringBuilder();
         /* <message> */

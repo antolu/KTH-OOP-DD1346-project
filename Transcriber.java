@@ -85,6 +85,9 @@ public class Transcriber {
                 return parseMessage(message);
             }
             else if (message.getTagName() == "request") {
+                if (message.hasAttribute("reply")) {
+                    return parseRequestResponse(message);
+                }
                 return parseRequest(message);
             }
             else if (message.getTagName() == "keyrequest") {
@@ -126,6 +129,13 @@ public class Transcriber {
         String name = rootElement.getAttribute("name");
 
         return new Request(decodeHTML(textMessage), name);
+    }
+
+    private static parseRequestResponse(Element rootElement) {
+        String reply = rootElement.getAttribute("reply");
+        String name = rootElement.getAttribute("name");
+
+        return new RequestResponse(name, reply);
     }
 
     private static KeyRequest parseKeyRequest(Element rootElement) {
