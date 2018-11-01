@@ -14,7 +14,8 @@ import java.io.InputStreamReader;
  * connection. 
  */
 public class SocketClient implements Runnable {
-	
+    
+    private Thread t;
 	
     private volatile Socket clientSocket;
     private Backend backend;
@@ -68,7 +69,7 @@ public class SocketClient implements Runnable {
 	 * Where the socket sends messages 
 	 * @param msg, the message to be sent 
 	 */
-	public void Send(String msg) {
+	public void send(String msg) {
         out.write(msg);
         out.flush();
     }
@@ -77,8 +78,12 @@ public class SocketClient implements Runnable {
         return ((InetSocketAddress) clientSocket.getRemoteSocketAddress()).getAddress().toString();
     }
 
-    public void close() throws IOException {
+    public void close() {
+        try {
         clientSocket.close();
+        } catch (IOException e) {
+            // Do nothing
+        }
     }
     
     @Override
@@ -96,7 +101,15 @@ public class SocketClient implements Runnable {
 
             parsedMessage = Transcriber.parse(message, this);
 
-            // Notify backend
+            backend.receiveMessage(parsedMessage, this);
         }
     }
+
+    public void start () {
+        // System.out.println("Starting " +  threadName );
+        if (t == null) {
+           t = new Thread(this);
+           t.start();
+        }
+     }
 }
