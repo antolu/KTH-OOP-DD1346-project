@@ -13,6 +13,11 @@ public class User {
     /** The socket with which to communicate with the user */
     private Socket clientSocket;
 
+    public User(String name, String ID) {
+        this.name = name;
+        this.ID = ID;
+    }
+
     /**
      * Basic encapsulation constructor.
      * @param name The name of the user.
@@ -20,8 +25,7 @@ public class User {
      * @param clientSocket The socket with which to communicate with the user
      */
     public User(String name, String ID, Socket clientSocket) {
-        this.name = name;
-        this.ID = ID;
+        this(name, ID);
         this.clientSocket = clientSocket;
     }
 

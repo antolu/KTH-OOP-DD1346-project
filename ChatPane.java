@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
  * on its own, sending messages of all forms to the correct socket.
  */
 public class ChatPane extends JPanel {
-    private JFrame mainFrame;
     /** The window that displays all the messages */
     private ChatWindow chatWindow;
     /** The textfield where you type your messages */
@@ -65,10 +64,9 @@ public class ChatPane extends JPanel {
      * @param user The user this ChatPane should belong to
      * @param clientSocket The socket with which to communicate.
      */
-    public ChatPane(User user, JFrame mainFrame) throws Exception {
+    public ChatPane(User user) {
         this.user = user;
         this.clientSocket = user.getClientSocket();
-        this.mainFrame = mainFrame;
 
         users = new ArrayList<>();
         sockets = new ArrayList<>();
@@ -81,7 +79,7 @@ public class ChatPane extends JPanel {
         addActionListeners(this);
     }
 
-    private void createGUI() throws Exception {
+    private void createGUI() {
         chatWindow = new ChatWindow(user);
         msgField = new JEditorPane();
 
@@ -147,6 +145,7 @@ public class ChatPane extends JPanel {
 
         this.add(leftPanel, BorderLayout.WEST);
         this.add(rightPanel, BorderLayout.WEST);
+        this.setPreferredSize(new Dimension(780, 470));
     }
 
     private void addActionListeners(ChatPane pane) {

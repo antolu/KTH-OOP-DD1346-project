@@ -46,7 +46,7 @@ public class MenuBar extends JPanel {
         setLayout(new FlowLayout(FlowLayout.LEFT));
 
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
-        setPreferredSize(new Dimension(740, 44));
+        setPreferredSize(new Dimension(760, 44));
         add(newConnectionButton, BorderLayout.WEST);
         add(changeNameButton, BorderLayout.WEST);
         add(disconnectButton, BorderLayout.WEST);

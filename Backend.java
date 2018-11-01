@@ -49,6 +49,8 @@ public class Backend implements ActionListener {
     private String myName;
     private int port;
 
+    private ChatPane chatPane;
+
     /**
      * Instantiates the necessary backend elements, generates and displays
      * initial GUI. Prompts for new connection if is a client, else waits
@@ -84,11 +86,18 @@ public class Backend implements ActionListener {
         });
 
         tabbedPane = new JTabbedPane();
+        tabbedPane.setPreferredSize(new Dimension(760, 500));
 
         frame.setLayout(new FlowLayout(FlowLayout.LEFT));
-        frame.setPreferredSize(new Dimension(750, 520));
+        frame.setPreferredSize(new Dimension(770, 560));
         frame.add(menuBar, BorderLayout.NORTH);
         frame.add(tabbedPane, BorderLayout.SOUTH);
+
+        // User testUser = new User("Other", "OtherIP");
+        // chatPane = new ChatPane(testUser);
+
+        // tabbedPane.add(testUser.getName(), chatPane);
+        // new MessageTest(this);
 
         frame.pack();
         frame.setVisible(true);
@@ -108,11 +117,29 @@ public class Backend implements ActionListener {
     /**
      * Observer-observable update method. called by the observables. 
      * Used for receiving new messages and queries from the client sockets.
-     * @param caller The object that called this method.
-     * @param arg Something to be passed along. Preferably a message.
+     * @param socket The socket that called this method.
+     * @param query The new message.
      */
-    public void update(Object caller, Object arg) {
+    public void receiveMessage(Query query) {
+        if (query instanceof Message) {
+            Message msg = (Message) query;
+            // chatPane.addMessage(msg);
+        }
+        else if (query instanceof Request) {
 
+        }
+        else if (query instanceof FileRequest) {
+            
+        }
+        else if (query instanceof FileResponse) {
+
+        }
+        else if (query instanceof KeyRequest) {
+
+        }
+        else if (query.getMessage().equals("<disconnect />")) {
+            // Disconnect the socket
+        }
     }
 
     /**

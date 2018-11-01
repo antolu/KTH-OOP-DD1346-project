@@ -33,7 +33,8 @@ public class ChatWindow extends JEditorPane {
     /** A list of all the received messages */
     private List<Message> messages;
 
-    public ChatWindow(User otherUser) throws Exception {
+    public ChatWindow(User otherUser) {
+        try {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         messagesPage = dBuilder.newDocument();
@@ -88,6 +89,9 @@ public class ChatWindow extends JEditorPane {
 
         setEditorKit(new HTMLEditorKit());
         setText(HTML);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
