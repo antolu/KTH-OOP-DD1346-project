@@ -178,7 +178,7 @@ public class Transcriber {
      * @param String input, message written in GUI
      * @return String, message to be sent with HTML names
      */
-    private static String encodeHTML(String input) {
+    public static String encodeHTML(String input) {
         input.replaceAll("\"", "&quot");
         input.replaceAll("&", "&amp");
         input.replaceAll("<", "&lt");
