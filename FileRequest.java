@@ -4,6 +4,7 @@
 public class FileRequest extends Query {
     private String fileName;
     private String fileSize;
+    private String IP;
     private String port;
     private String encryptionType;
     private String encryptionKey;
@@ -14,10 +15,11 @@ public class FileRequest extends Query {
      * @param fileName The name of the file to be transferred.
      * @param fileSize The size of the file to be transferred.
      */
-    public FileRequest(String message, String fileName, String fileSize, String port, String encryptionType, String encryptionKey) {
+    public FileRequest(String message, String fileName, String fileSize, String IP, String port, String encryptionType, String encryptionKey) {
         super(message);
         this.fileName = fileName;
         this.fileSize = fileSize;
+        this.IP = IP;
         this.port = port;
         this.encryptionType = encryptionType;
         this.encryptionKey = encryptionKey;
@@ -36,6 +38,14 @@ public class FileRequest extends Query {
     public String getFileSize() {
         return fileSize;
     }
+
+    /**
+     * @return the IP
+     */
+    public String getIP() {
+        return IP;
+    }
+
     /**
      * @return the port
      */

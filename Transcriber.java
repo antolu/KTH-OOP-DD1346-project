@@ -14,6 +14,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import java.time.format.DateTimeFormatter;  
 import java.time.LocalDateTime;  
+import java.net.InetSocketAddress;
 
 /**
  * Translates incoming messages in byte or string form to a fully readable
@@ -64,7 +65,7 @@ public class Transcriber {
      * @param String msg, the received xml message 
      * @return Message, the received message parsed
      */
-    public static Query parse(String msg) {
+    public static Query parse(String msg, SocketClient socket) {
         msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + msg;
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
 
@@ -76,7 +77,7 @@ public class Transcriber {
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
                 if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
-                    return parseFileRequest((Element) message.getChildNodes().item(0));
+                    return parseFileRequest((Element) message.getChildNodes().item(0), socket);
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
                     return parseFileResponse((Element) message.getChildNodes().item(0));
                 else if (message.getTextContent().equals("<disconnect />"))
@@ -135,7 +136,7 @@ public class Transcriber {
         // <keyrequest type="">Something</keyrequest>
     }
 
-    private static FileRequest parseFileRequest(Element rootElement) {
+    private static FileRequest parseFileRequest(Element rootElement, SocketClient socket) {
         String textMessage = decodeHTML(rootElement.getTextContent());
         String filesize = rootElement.getAttribute("size");
         String filename = rootElement.getAttribute("name");
@@ -143,7 +144,7 @@ public class Transcriber {
         String encryptionType = rootElement.getAttribute("type");
         String encryptionKey = rootElement.getAttribute("key");
 
-        return new FileRequest(textMessage, filename, filesize, port, encryptionType, encryptionKey);
+        return new FileRequest(textMessage, filename, filesize, socket.getSocketID(), port, encryptionType, encryptionKey);
         // Handle the file request, <filerequest name="" size="" type="" key=""></filerequest>
     }
 

@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.InetSocketAddress;
 
 import java.lang.Runnable;
 import java.lang.Thread;
@@ -73,7 +74,7 @@ public class SocketClient implements Runnable {
     }
     
     public String getSocketID() {
-        return clientSocket.getRemoteSocketAddress().toString();
+        return ((InetSocketAddress) clientSocket.getRemoteSocketAddress()).getAddress().toString();
     }
 
     public void close() throws IOException {
@@ -93,7 +94,7 @@ public class SocketClient implements Runnable {
         while (clientSocket.isConnected()) {
             message = receive();
 
-            parsedMessage = Transcriber.parse(message);
+            parsedMessage = Transcriber.parse(message, this);
 
             // Notify backend
         }
