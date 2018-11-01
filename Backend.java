@@ -1,12 +1,22 @@
+import java.awt.BorderLayout;
+import java.awt.event.WindowEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 
 import javax.swing.JPanel;
+import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.JOptionPane;
 import java.util.HashMap;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.WindowAdapter;
+
+import java.io.IOException;
 
 /**
  * The controller backend for the chat client. Supports
@@ -22,8 +32,9 @@ import java.util.HashMap;
 public class Backend implements ActionListener {
     private static final int MAX_CONNECTIONS = 3;
 
+    private JFrame frame;
     /** The menu bar containing buttons for new connection, disconnect, change name */
-    private JPanel menuBar;
+    private MenuBar menuBar;
     /** The graphical element for each chat. */
     private JTabbedPane tabbedPane;
     /** The mother of sockets */
@@ -35,6 +46,9 @@ public class Backend implements ActionListener {
     /** Mapping chat panes to corresponding user */
     private HashMap<User, ChatPane> chatMap;
 
+    private String myName;
+    private int port;
+
     /**
      * Instantiates the necessary backend elements, generates and displays
      * initial GUI. Prompts for new connection if is a client, else waits
@@ -44,7 +58,40 @@ public class Backend implements ActionListener {
      * or client.
      */
     public Backend(ourStruct info) {
+        Encrypter.initialize();
 
+        myName = info.getName();
+        port = info.getPort();
+        serverSocket = info.getServerSocket();
+
+        frame = new JFrame("Chat");
+        menuBar = new MenuBar(this);
+
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int confirm = JOptionPane.showOptionDialog(
+                    null, "Are You Sure to Close Application?", 
+                    "Exit Confirmation", JOptionPane.YES_NO_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE, null, null, null);
+                if (confirm == 0) {
+                    disconnect();
+                    System.exit(0);
+                }
+            }
+        });
+
+        tabbedPane = new JTabbedPane();
+
+        frame.setLayout(new FlowLayout(FlowLayout.LEFT));
+        frame.setPreferredSize(new Dimension(750, 520));
+        frame.add(menuBar, BorderLayout.NORTH);
+        frame.add(tabbedPane, BorderLayout.SOUTH);
+
+        frame.pack();
+        frame.setVisible(true);
     }
 
     /**
@@ -103,8 +150,8 @@ public class Backend implements ActionListener {
      * Called when the user wants to set up a new connection as client.
      * Displays a new window prompting for IP, port and message.
      */
-    private void newConnection() {
-        
+    public void newConnection(InetAddress IP, int port, String message) {
+        // Attempt to connect to the other user
     }
 
     /**
@@ -116,5 +163,24 @@ public class Backend implements ActionListener {
      */
     private void disconnect(Socket socket) {
 
+    }
+
+    public void updateName(String newName) {
+        if (newName.equals("")) {
+            myName = serverSocket.getLocalSocketAddress().toString();
+        }
+        else {
+            myName = newName;
+        }
+    }
+
+    public void disconnect() {
+        try {
+            serverSocket.close();
+        }
+        catch (IOException e) {
+            System.err.println("Server socket failed to close");
+        }
+        // 
     }
 }
