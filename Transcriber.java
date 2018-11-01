@@ -76,9 +76,9 @@ public class Transcriber {
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
                 if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
-                    return parseFileReponse((Element) message.getChildNodes().item(0));
-                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
                     return parseFileRequest((Element) message.getChildNodes().item(0));
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
+                    return parseFileResponse((Element) message.getChildNodes().item(0));
                 else if (message.getTextContent().equals("<disconnect />"))
                     return new Query("<disconnect />");
                 return parseMessage(message);
@@ -111,7 +111,7 @@ public class Transcriber {
             }
         }
         else {
-            textMessage = tex.getTextContent();
+            textMessage = text.getTextContent();
         }
 
         String color = text.getAttribute("color");
