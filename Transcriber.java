@@ -76,7 +76,7 @@ public class Transcriber {
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
                 if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
-                    return parseFileRequest((Element) message.getChildNodes().item(0));
+                    return parseFileReponse((Element) message.getChildNodes().item(0));
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
                     return parseFileRequest((Element) message.getChildNodes().item(0));
                 else if (message.getTextContent().equals("<disconnect />"))
