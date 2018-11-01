@@ -3,7 +3,7 @@
  */
 public class Message extends Query {
     private String color = "000000";
-    private String time;
+    private String time = "";
     private String username = "";
 
     /**
