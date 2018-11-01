@@ -1,5 +1,6 @@
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import java.
 
 public class FileHandler{
 	
@@ -122,7 +123,7 @@ public class FileHandler{
                 		socket.close();
                         return;
                     }
-                	if(requestAnswered==true) {
+                	if(requestAnswered) {
                 		isRunning=false;
                 		return;
                 	}
