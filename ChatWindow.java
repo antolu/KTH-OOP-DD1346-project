@@ -102,7 +102,7 @@ public class ChatWindow extends JEditorPane {
      * @param msg The message to be added.
      */
     public void addMessage(Message msg) {
-        addTableElement(msg.getUsername(), msg.getMessage(), "", msg.getColor());
+        addTableElement(msg.getUsername() + "\n" + msg.getTime(), msg.getMessage(), "", msg.getColor());
         refreshWindow();
     }
 
@@ -150,7 +150,7 @@ public class ChatWindow extends JEditorPane {
             DOMSource domSource = new DOMSource(messagesPage);
             StreamResult result = new StreamResult(writer);
             transformer.transform(domSource, result);
-            System.out.println(writer.toString());
+            // System.out.println(writer.toString());
             return writer.toString();
         } catch (Exception e) {
             e.printStackTrace();
