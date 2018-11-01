@@ -42,11 +42,11 @@ public class ChatPane extends JPanel {
     /** The user messages are sent to */
     private User user;
     /** The socket messages are sent to */
-    private Socket clientSocket;
+    private SocketClient clientSocket;
 
     /** Placeholder for multipart chats */
     private List<User> users;
-    private List<Socket> sockets;
+    private List<SocketClient> sockets;
 
     /** The current color all msesages are sent with */
     private volatile String currentColor = "";

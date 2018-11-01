@@ -11,7 +11,7 @@ public class User {
     private String ID;
 
     /** The socket with which to communicate with the user */
-    private Socket clientSocket;
+    private SocketClient clientSocket;
 
     public User(String name, String ID) {
         this.name = name;
@@ -24,7 +24,7 @@ public class User {
      * @param ID The IP adress and port of the user, used as UUID.
      * @param clientSocket The socket with which to communicate with the user
      */
-    public User(String name, String ID, Socket clientSocket) {
+    public User(String name, String ID, SocketClient clientSocket) {
         this(name, ID);
         this.clientSocket = clientSocket;
     }
@@ -46,7 +46,7 @@ public class User {
     /**
      * @return the clientSocket
      */
-    public Socket getClientSocket() {
+    public SocketClient getClientSocket() {
         return clientSocket;
     }
 

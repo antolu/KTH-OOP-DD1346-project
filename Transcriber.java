@@ -131,7 +131,7 @@ public class Transcriber {
         return new Request(decodeHTML(textMessage), name);
     }
 
-    private static parseRequestResponse(Element rootElement) {
+    private static RequestResponse parseRequestResponse(Element rootElement) {
         String reply = rootElement.getAttribute("reply");
         String name = rootElement.getAttribute("name");
 
