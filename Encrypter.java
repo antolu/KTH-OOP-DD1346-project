@@ -80,6 +80,9 @@ public class Encrypter {
                 else if (Character.isLowerCase(c)) {
                     sb.append(lowercase[(lowercaseMap.get(c) - secretKey) % lowercase.length]);
                 }
+                else {
+                    sb.append(c);
+                }
             }
 
             return Transcriber.stringToByte(sb.toString());
@@ -119,6 +122,9 @@ public class Encrypter {
                 }
                 else if (Character.isLowerCase(c)) {
                     sb.append(lowercase[(lowercaseMap.get(c) + secretKey) % lowercase.length]);
+                }
+                else {
+                    sb.append(c);
                 }
             }
 
