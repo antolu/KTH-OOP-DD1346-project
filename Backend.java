@@ -122,7 +122,9 @@ public class Backend {
             chatPane.addMessage(msg);
         }
         else if (query instanceof Request) {
-
+            Request request = (Request) query;
+            User newUser = new User(request.getName(), socket.getSocketID(), socket);
+            showConnectionRequest(request, newUser);
         }
         else if (query instanceof RequestResponse) {
             RequestResponse response = (RequestResponse) query;
@@ -153,11 +155,11 @@ public class Backend {
      * Called whena new incoming connection request is detected. 
      * Displays a new window prompting whether to accept the new
      * connection.
-     * @param connectionRequest The message encapsulated in the connection
+     * @param request The message encapsulated in the connection
      * request. 
      */
-    private void showConnectionRequest(String connectionRequest) {
-
+    private void showConnectionRequest(Request request, User user) {
+        new InConnectionPrompt(request.getMessage(), user, this);
     }
 
     /**
@@ -205,6 +207,25 @@ public class Backend {
         tabbedPane.addTab(name, newPane);
     }
 
+        /**
+     * Internal method to process an incoming connection. Displays connection
+     * request prompt, appends socket and new user to corresponding lists, 
+     * creates new ChatPane if connection is accepted.
+     * @param socket The client socket where the connection was established.
+     * @param connectionRequest The message encapsulated in the connection request.
+     */
+    public void addConnectionAsServer(User user) {
+        user.getClientSocket().send(Composer.composeRequestReply(myName, "yes"));
+
+        userList.add(user);
+        userMap.put(user.getClientSocket().getSocketID(), user);
+
+        ChatPane newPane = new ChatPane(user);
+
+        chatMap.put(user, newPane);
+        tabbedPane.addTab(user.getName(), newPane);
+    }
+
     /**
      * Internal method to process an incoming connection. Displays connection
      * request prompt, appends socket and new user to corresponding lists, 
@@ -244,5 +265,12 @@ public class Backend {
             System.err.println("Server socket failed to close");
         }
         // 
+    }
+
+    /**
+     * @return the myName
+     */
+    public String getMyName() {
+        return myName;
     }
 }
