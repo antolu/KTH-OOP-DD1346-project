@@ -1,7 +1,7 @@
 /**
  * Basic class encapsulating information from a new connection request.
  */
-public class ConnectionRequest extends Query {
+public class Request extends Query {
     private String name;
 
     /**
@@ -9,7 +9,7 @@ public class ConnectionRequest extends Query {
      * @param message The connection request message.
      * @param name The name of the user that sent the request.
      */
-    public ConnectionRequest(String message, String name) {
+    public Request(String message, String name) {
         super(message);
         this.name = name;
     }
