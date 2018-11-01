@@ -6,20 +6,17 @@ import java.net.ServerSocket;
 public class ourStruct {
     private int port;
     private String name;
-    private Boolean isServer;
     private ServerSocket serverSocket;
 
     /**
      * Basic encapsulation constructor.
      * @param port The port where the server socket is bound to.
      * @param name  The name of the user.
-     * @param isServer If this chat is a server or a client.
      * @param serverSocket The initialized server socket.
      */
-    public ourStruct(int port, String name, Boolean isServer, ServerSocket serverSocket) {
+    public ourStruct(int port, String name, ServerSocket serverSocket) {
         this.port = port;
         this.name = name;
-        this.isServer = isServer;
         this.serverSocket = serverSocket; 
     }
 
@@ -37,13 +34,6 @@ public class ourStruct {
         return name;
     }
 
-    /**
-     * @return the isServer
-     */
-    public Boolean getIsServer() {
-        return isServer;
-    }
-    
     /**
      * @return the serverSocket
      */
