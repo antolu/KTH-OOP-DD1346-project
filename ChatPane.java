@@ -4,6 +4,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import java.awt.Component;
 
 import java.awt.BorderLayout;
@@ -49,7 +50,7 @@ public class ChatPane extends JPanel {
     private List<SocketClient> sockets;
 
     /** The current color all msesages are sent with */
-    private volatile String currentColor = "";
+    private volatile String currentColor = "000000";
     /** If this JPanel is visible in the GUI currently or not. */
     private Boolean isVisible;
     /** The current global enryption type */
@@ -151,14 +152,22 @@ public class ChatPane extends JPanel {
     private void addActionListeners(ChatPane pane) {
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            String message = msgField.getText();
-            Message msg = new Message(message, currentColor, dtf.format(LocalDateTime.now()), "Me");
-            chatWindow.sentMessage(msg);
+                String message = msgField.getText();
+                Message msg = new Message(message, currentColor, dtf.format(LocalDateTime.now()), "Me");
+                chatWindow.sentMessage(msg);
 
-            // Actually send the message to the socket(s)
-            // if (encryptButton.getState()) {
-            //     // Create encrypted message
-            // }
+
+                // Actually send the message to the socket(s)
+                if (encryptButton.getState()) {
+                    message = Composer.composeMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), user.getName());
+                }
+                else {
+                    message = Composer.composeMessage(message, currentColor, "", "", user.getName());
+                }
+
+                for (SocketClient socket : sockets) {
+                    socket.send(message);
+                }
             }
         });
 
@@ -184,6 +193,10 @@ public class ChatPane extends JPanel {
 
         encryptButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                if (currentEncryptionType.equals("")) {
+                    JOptionPane.showMessageDialog(pane, "No encryption has been selected. Please select an encryption first.");
+                    return;
+                }
                 encryptButton.toggleState();
             }
         });
