@@ -46,6 +46,7 @@ public class Backend {
     private List<User> userList;
     /** Mapping chat panes to corresponding user */
     private HashMap<User, ChatPane> chatMap;
+    private HashMap<String, User> userMap;
 
     private String myName;
     private int port;
@@ -62,6 +63,8 @@ public class Backend {
      */
     public Backend(ourStruct info) {
         Encrypter.initialize();
+        chatMap = new HashMap<>();
+        userMap = new HashMap<>();
 
         myName = info.getName();
         port = info.getPort();
@@ -113,7 +116,10 @@ public class Backend {
     public void receiveMessage(Query query, SocketClient socket) {
         if (query instanceof Message) {
             Message msg = (Message) query;
-            // chatPane.addMessage(msg);
+
+            User user = userMap.get(socket.getSocketID());
+            ChatPane chatPane = chatMap.get(user);
+            chatPane.addMessage(msg);
         }
         else if (query instanceof Request) {
 
@@ -191,6 +197,7 @@ public class Backend {
         User newUser = new User(name, socket.getSocketID(), socket);
 
         userList.add(newUser);
+        userMap.put(socket.getSocketID(), newUser);
 
         ChatPane newPane = new ChatPane(newUser);
 
