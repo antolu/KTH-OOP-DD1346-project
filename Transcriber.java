@@ -75,59 +75,85 @@ public class Transcriber {
 
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
-                Element text = (Element) message.getElementsByTagName("text").item(0);
-                String textMessage = text.getTextContent();
-
-                if (text.getElementsByTagName("encrypted").item(0) != null) {
-                    NodeList childNodes = text.getChildNodes();
-
-                    for (int i = 0; i < childNodes.getLength(); i++) {
-                        Element node = (Element) childNodes.item(i);
-                        String encryptionType = node.getAttribute("type");
-                        String encryptionKey = node.getAttribute("key");
-                        textMessage += Encrypter.decrypt(encryptionType, encryptionKey, stringToByte(node.getTextContent()));
-                    }
-                }
-
-                String color = text.getAttribute("color");
-                String time = dtf.format(LocalDateTime.now());
-
-                return new Message(decodeHTML(textMessage), color, time, message.getAttribute("name"));
+                if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
+                    return parseFileRequest((Element) message.getChildNodes().item(0));
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
+                    return parseFileRequest((Element) message.getChildNodes().item(0));
+                else if (message.getTextContent().equals("<disconnect />"))
+                    return new Query("<disconnect />");
+                return parseTextMessage(message);
             }
             else if (message.getTagName() == "request") {
-                String textMessage = message.getTextContent();
-                String name = message.getAttribute("name");
-
-                return new ConnectionRequest(textMessage, name);
+                return parseRequest(message);
             }
             else if (message.getTagName() == "keyrequest") {
-                String textMessage = message.getTextContent();
-                String encryptionType = message.getAttribute("type");
-
-                return new KeyRequest(textMessage, encryptionType);
-                // <keyrequest type="">Something</keyrequest>
+                return parseKeyRequest(message);
             }
-            else if (message.getTagName() == "filerequest") {
-                String textMessage = decodeHTML(message.getTextContent());
-                String filesize = message.getAttribute("size");
-                String filename = message.getAttribute("name");
-                String encryptionType = message.getAttribute("type");
-                String encryptionKey = message.getAttribute("key");
-
-                return new FileRequest(textMessage, filename, filesize, encryptionType, encryptionKey);
-                // Handle the file request, <filerequest name="" size="" type="" key=""></filerequest>
-            }
-            else if (message.getTagName() == "fileresponse") {
-                String textMessage = decodeHTML(message.getTextContent());
-
-                // Handle it. <fileresponse reply="" port=""></fileresponse>
-            }
-            // Also need to handle <message><disconnect /></message>
             return new Message(errorMsg);
         } catch(Exception e) {
             e.printStackTrace();
             return new Message(errorMsg);
         }
+    }
+
+    private static Message parseMessage(Element rootElement) {
+        Element text = (Element) rootElement.getElementsByTagName("text").item(0);
+        String textMessage = text.getTextContent();
+
+        if (text.getElementsByTagName("encrypted").item(0) != null) {
+            NodeList childNodes = text.getChildNodes();
+
+            for (int i = 0; i < childNodes.getLength(); i++) {
+                Element node = (Element) childNodes.item(i);
+                String encryptionType = node.getAttribute("type");
+                String encryptionKey = node.getAttribute("key");
+                textMessage += Encrypter.decrypt(encryptionType, encryptionKey, stringToByte(node.getTextContent()));
+            }
+        }
+
+        String color = text.getAttribute("color");
+        String time = dtf.format(LocalDateTime.now());
+
+        return new Message(decodeHTML(textMessage), color, time, rootElement.getAttribute("name"));
+    }
+
+    private static Request parseRequest(Element rootElement) {
+        String textMessage = rootElement.getTextContent();
+        String name = rootElement.getAttribute("name");
+
+        return new Request(decodeHTML(textMessage), name);
+    }
+
+    private static KeyRequest parseKeyRequest(Element rootElement) {
+        String textMessage = rootElement.getTextContent();
+        String encryptionType = rootElement.getAttribute("type");
+
+        return new KeyRequest(decodeHTML(textMessage), encryptionType);
+        // <keyrequest type="">Something</keyrequest>
+    }
+
+    private static FileRequest parseFileRequest(Element rootElement) {
+        String textMessage = decodeHTML(rootElement.getTextContent());
+        String filesize = rootElement.getAttribute("size");
+        String filename = rootElement.getAttribute("name");
+        String port = rootElement.getAttribute("port");
+        String encryptionType = rootElement.getAttribute("type");
+        String encryptionKey = rootElement.getAttribute("key");
+
+        return new FileRequest(textMessage, filename, filesize, port, encryptionType, encryptionKey);
+        // Handle the file request, <filerequest name="" size="" type="" key=""></filerequest>
+    }
+
+    private static FileResponse parseFileResponse(Element rootElement) {
+        String textMessage = decodeHTML(rootElement.getTextContent());
+        String reply = rootElement.getAttribute("reply");
+
+        if (reply.equals("")) {
+            reply = "no";
+        }
+
+        return new FileResponse(textMessage, reply);
+        // Handle it. <fileresponse reply="" ></fileresponse>
     }
     
     /**
