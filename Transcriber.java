@@ -81,7 +81,7 @@ public class Transcriber {
                     return parseFileRequest((Element) message.getChildNodes().item(0));
                 else if (message.getTextContent().equals("<disconnect />"))
                     return new Query("<disconnect />");
-                return parseTextMessage(message);
+                return parseMessage(message);
             }
             else if (message.getTagName() == "request") {
                 return parseRequest(message);
@@ -98,7 +98,7 @@ public class Transcriber {
 
     private static Message parseMessage(Element rootElement) {
         Element text = (Element) rootElement.getElementsByTagName("text").item(0);
-        String textMessage = text.getTextContent();
+        String textMessage = "";
 
         if (text.getElementsByTagName("encrypted").item(0) != null) {
             NodeList childNodes = text.getChildNodes();
@@ -107,8 +107,11 @@ public class Transcriber {
                 Element node = (Element) childNodes.item(i);
                 String encryptionType = node.getAttribute("type");
                 String encryptionKey = node.getAttribute("key");
-                textMessage += Encrypter.decrypt(encryptionType, encryptionKey, stringToByte(node.getTextContent()));
+                textMessage += byteToString(Encrypter.decrypt(encryptionType, encryptionKey, stringToByte(node.getTextContent())));
             }
+        }
+        else {
+            textMessage = tex.getTextContent();
         }
 
         String color = text.getAttribute("color");
