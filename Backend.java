@@ -167,7 +167,12 @@ public class Backend {
         }
 
         connectedUsersCount++;
-        new InConnectionPrompt(request.getMessage(), user, this);
+        final Backend backendHere = backend;
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new InConnectionPrompt(request.getMessage(), user, backendHere);
+            }
+        });
     }
 
     /**
