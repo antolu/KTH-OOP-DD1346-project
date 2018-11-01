@@ -1,6 +1,12 @@
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import java.
+import java.io.*;
+import java.net.*;
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.awt.event.*;
+
 
 public class FileHandler{
 	
@@ -9,11 +15,16 @@ public class FileHandler{
 	 */
 	public volatile boolean isRunning; 
 	public volatile boolean requestAnswered; 
-	public Socket socket=null; 
+	public ServerSocket server=null;
+	public static Socket client = null;
 	public File file=null;
-	public User user = null;
+	public static User user = null;
 	public String encr = "";
 	public String key = null; 
+	private FileInputStream fInputStream=null;
+	private BufferedInputStream bInputStream=null;
+	private OutputStream os=null;
+	private PrintWriter out = null;
 	
 	public FileHandler() {
 		isRunning = true;
@@ -23,13 +34,14 @@ public class FileHandler{
 	/**
 	 * Send a response for a file request
 	 * 
-	 * @param socket, the socket from which the communication goes through
 	 * @param message, the accompaning message
 	 * @param reply, yes/no (accept/decline the file request
 	 */
-	private static void SendResponse(Socket inSocket, String message, String reply) {
-		socket = inSocket;
+	private static void SendResponse(String message, String reply) {
+		
 		//Skicka vidare till XML-creator, få ett response skicka ut
+		//client.write(message);
+		//client 
 	}
 	
 	/**
@@ -37,8 +49,15 @@ public class FileHandler{
 	 * @param filerequest, containing optional accompanning message, file size and file name
 	 * @param socket, from  which socket the message came from
 	 */
-	public static void ShowFileRequest(FileRequest filerequest, Socket inSocket, User inUser) {
+	public static void ShowFileRequest(FileRequest filerequest, User inUser) {
 		
+		String host = filerequest.getIP();
+		
+		try {
+			client = new Socket(host, Integer.parseInt(filerequest.getPort()));
+		}catch(IOException e) {
+			//do something
+		}
 		user = inUser;
 		
 		JFrame fileRequest = new JFrame("File Request");
@@ -65,15 +84,24 @@ public class FileHandler{
 
         accept.addActionListener(new ActionListener(){
         	public void actionPerformed(ActionEvent e){
-        		SendResponse(inSocket, message.getText(), "Yes");
-                fileRequest.dispose();          
+        		fileRequest.dispose(); 
+        		SendResponse(message.getText(), "Yes");
+        		
+        		//Börja lyssna på clienten
+        		//när vi får filen så skapar vi en progressFrame
+        		
         	}
         }); 
 		
 		decline.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SendResponse(inSocket, message.getText(), "No");
+				SendResponse(message.getText(), "No");
 		        fileRequest.dispose();
+		        try{
+		        	client.close();
+		        }catch(IOException e1) {
+		        	//do something
+		        }
 		    }
 		});
 		
@@ -104,12 +132,16 @@ public class FileHandler{
 	 * @param key, the key corresponding to the encryption
 	 * @param user, the object/person which the file is to be sent to
 	 */
-	public void sendFileRequest(String message, int port, File file, String inEncr, String inKey, User inUser) {
+	public void sendFileRequest(ServerSocket inServer, Socket messageSocket, String message, int port, File inFile, String inEncr, String inKey, User inUser) {
 		
 		user = inUser; 
 		String username = user.getName();
 		encr = inEncr;
 		key = inKey;
+		file = inFile;
+		
+		server = inServer;
+		//Create in and out-writer
 		
 		Thread t = new Thread(username){
             public void run(){
@@ -120,7 +152,12 @@ public class FileHandler{
                 	if(countDown<=0){
                 		displayQueryError(user);
                     	isRunning = false;
-                		socket.close();
+                    	try {
+                    		server.close();
+                    	}catch(IOException e) {
+                    		//do something
+                    	}
+                	
                         return;
                     }
                 	if(requestAnswered) {
@@ -140,6 +177,9 @@ public class FileHandler{
 		};
 		
 		t.start();
+		
+		//Compose the request 
+		//Send through socket
 		
 	}
 	
@@ -181,34 +221,74 @@ public class FileHandler{
 	 * 
 	 * @param response, 
 	 */
-	public void handleResponse(String response) {
+	public void handleResponse(String response) throws InterruptedException {
+		
 		
 		requestAnswered = true;
+		Socket clientSocket=null;
 		//
 		//all the things used as file,socket etc needs to be saved somewhere before
 		if(response=="yes") {
 			
-			showFileTransferProgress(user.getName());
-			byte [] byteArray  = new byte [(int)file.length()];
+		
+				try{
+					clientSocket = server.accept();
+					out = new PrintWriter(clientSocket.getOutputStream(),true);
+					//in = BufferedReader(new InputStreamReader(
+					//		clientSocket.getInputStream()));
+					os = clientSocket.getOutputStream();
 			
-			if(encr!=null) {
-				byteArray = Encrypt.encrypt(encr, key, byteArray);
-			}
+				}catch(IOException e ) {
+					//do something
+				}
+				
+		
+			JFrame progressFrame = new JFrame("Progress Demo");
+			progressFrame.setSize(200,200);
+			
+			ProgressMonitorInputStream pMonitorInputStream;
 			
 			try {
-		        FileInputStream fInputStream = new FileInputStream(file);
-		        BufferedInputStream bInputStream = new BufferedInputStream(fInputStream);
-		        bInputStream.read(byteArray,0,byteArray.length);
-		        OutputStream os = socket.getOutputStream();
-		        os.write(byteArray,0,byteArray.length);
-		        os.flush();
-			}catch(IOException e) {
-				//Do something
+				BufferedInputStream bis = new BufferedInputStream(
+						pMonitorInputStream = new ProgressMonitorInputStream(
+								progressFrame, "Sending "+file.getName(),
+								 new FileInputStream(file))); 
+				ProgressMonitor progressMonitor = pMonitorInputStream.getProgressMonitor();
+				progressMonitor.setMillisToDecideToPopup(2);
+                progressMonitor.setMillisToPopup(2);
+
+                byte[] buffer = new byte[2048];
+                while((bis.read(buffer))!=-1){
+                	
+                		if(encr!=null) {
+                			buffer = Encrypter.encrypt(encr, key, buffer);
+                		}
+                		
+                        os.write(buffer,0,buffer.length);
+                        progressMonitor.setNote(" File transfer to "+user.getName()+" "+bis.available()/1000+" more kb to read ");
+                        Thread.sleep(500);
+                }
+			}catch(Exception e){
+                throw new RuntimeException(e);
 			}
-		}
-		else {
-			socket.close();
+
+			//os.flush();
+			Thread.sleep(5000);
+			try {
+				clientSocket.close();
+				server.close();
+			}catch(IOException e) {
+				//do something
+			}
 			
+		}else {
+			try{
+				server.close();
+				clientSocket.close();
+			}catch(IOException e) {
+				//do something
+			}
+		
 			JFrame requestResponse=new JFrame("Warning");
 			
             JButton respondButton=new JButton("OK");  
