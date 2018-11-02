@@ -84,6 +84,7 @@ public class SocketClient implements Runnable {
         try {
         clientSocket.close();
         } catch (IOException e) {
+            System.err.println("Unable to close socket");
             // Do nothing
         }
     }
@@ -98,7 +99,7 @@ public class SocketClient implements Runnable {
     public void run() {
         String message;
         Query parsedMessage;
-        while (clientSocket.isConnected()) {
+        while (!clientSocket.isClosed()) {
             message = receive();
             System.err.println("Received message " + message);
             if (message.equals(""))
