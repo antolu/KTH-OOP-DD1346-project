@@ -80,7 +80,7 @@ public class Transcriber {
                     return parseFileRequest((Element) message.getChildNodes().item(0), socket);
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
                     return parseFileResponse((Element) message.getChildNodes().item(0));
-                else if (message.getTextContent().equals("<disconnect />"))
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("disconnect"))
                     return new Query("<disconnect />");
                 return parseMessage(message);
             }
