@@ -1,4 +1,5 @@
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.String;
@@ -16,6 +17,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;  
 import java.net.InetSocketAddress;
 
+import java.util.Base64;
+
 /**
  * Translates incoming messages in byte or string form to a fully readable
  * message incapsulated in a Message object.
@@ -30,7 +33,15 @@ public class Transcriber {
      * @return The converted string.
      */
     public static String byteToString(byte[] bytes) {
-        return new String(bytes, Charset.forName("UTF-8"));
+        // try {
+        //     return new String(bytes, "UTF-8");
+        // } catch (Exception e)
+        // {
+        //     return "";
+        // }
+        return new String(bytes, StandardCharsets.UTF_8);
+        // return Base64.getEncoder().encodeToString(bytes);
+        // return Base64.encodeBase64String(bytes);
     }
 
     /**
@@ -39,7 +50,13 @@ public class Transcriber {
      * @return The converted byte array.
      */
     public static byte[] stringToByte(String string) {
-        return string.getBytes(Charset.forName("UTF-8"));
+        // try {
+        //     return string.getBytes("UTF-8");
+        // } catch (Exception e) {
+        //     return null;
+        // }
+        return string.getBytes(StandardCharsets.UTF_8);
+        // return Base64.getDecoder().decode(string);
     }
 
     /**
