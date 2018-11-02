@@ -5,6 +5,7 @@ public class Message extends Query {
     private String color = "000000";
     private String time = "";
     private String username = "";
+    private String multipartMode = "";
 
     /**
      * Constructs a message without color.
@@ -46,6 +47,20 @@ public class Message extends Query {
      */
     public String getUsername() {
         return username;
+    }
+
+    /**
+     * @param multipartMode the multipartMode to set
+     */
+    public void setMultipartMode(String multipartMode) {
+        this.multipartMode = multipartMode;
+    }
+    
+    /**
+     * @return the multipartMode
+     */
+    public String getMultipartMode() {
+        return multipartMode;
     }
 
     @Override
