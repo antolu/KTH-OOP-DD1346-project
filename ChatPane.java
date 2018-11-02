@@ -40,6 +40,7 @@ public class ChatPane extends JPanel {
     private JButton setColorButton;
     private JButton disconnectButton;
     private ToggleableButton encryptButton;
+    private JButton closeButton;
 
     /** The user messages are sent to */
     private User user;
@@ -93,6 +94,7 @@ public class ChatPane extends JPanel {
         disconnectButton = new JButton();
         sendButton = new JButton();
         encryptButton = new ToggleableButton("Encrypted", "Decrypted");
+        closeButton = new JButton();
 
         sendFileButton.setText("Send file");
         setEncryptionButton.setText("Set encryption");
@@ -100,6 +102,7 @@ public class ChatPane extends JPanel {
         disconnectButton.setText("Disconnect");
         sendButton.setText("Send");
         encryptButton.setText("Encrypt");
+        closeButton.setText("Close");
 
         sendFileButton.setMaximumSize(new Dimension(140, 30));
         setEncryptionButton.setMaximumSize(new Dimension(140, 30));
@@ -107,11 +110,13 @@ public class ChatPane extends JPanel {
         disconnectButton.setMaximumSize(new Dimension(140, 30));
         sendButton.setMaximumSize(new Dimension(95, 30));
         encryptButton.setMaximumSize(new Dimension(95, 30));
+        closeButton.setMaximumSize(new Dimension(140, 30));
 
         sendFileButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         setEncryptionButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         setColorButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         disconnectButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        closeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         sendButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         encryptButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -145,6 +150,7 @@ public class ChatPane extends JPanel {
         rightPanel.add(setEncryptionButton);
         rightPanel.add(setColorButton);
         rightPanel.add(disconnectButton);
+        rightPanel.add(closeButton);
 
         this.add(leftPanel, BorderLayout.WEST);
         this.add(rightPanel, BorderLayout.WEST);
@@ -212,9 +218,55 @@ public class ChatPane extends JPanel {
 
         disconnectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                int confirm = JOptionPane.showOptionDialog(
+                    null, "Are You Sure to disconnect?", 
+                    "Disconnect Confirmation", JOptionPane.YES_NO_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE, null, null, null);
+                if (confirm == 0) {
+                    disconnect();
+                }
                 // Disconnect using backend or inform backend. SHOW CONFIRMATION!!!
             }
         });
+
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int confirm = JOptionPane.showOptionDialog(
+                    null, "Are you sure you want to close this window? \n This will close the connection if it is still open.", 
+                    "Disconnect Confirmation", JOptionPane.YES_NO_OPTION, 
+                    JOptionPane.QUESTION_MESSAGE, null, null, null);
+                if (confirm == 0) {
+                    close();
+                }
+                // Disconnect using backend or inform backend. SHOW CONFIRMATION!!!
+            }
+        });
+    }
+
+    private void close() {
+        if (sendButton.isEnabled()) 
+            disconnect();
+
+        backend.close(this, users.get(0));
+    }
+
+    private void disconnect() {
+        sockets.get(0).send(Composer.getDisconnectMessage());
+        disconnectExternal();
+    }
+
+    public void disconnectExternal() {
+        sendButton.setEnabled(false);
+        sendFileButton.setEnabled(false);
+        setEncryptionButton.setEnabled(false);
+        encryptButton.setEnabled(false);
+        setColorButton.setEnabled(false);
+        msgField.setEditable(false);
+
+        chatWindow.addMessage(new Message(users.get(0) + " disconnected.", "000000", "", ""));
+        sockets.get(0).close();
+
+        backend.disconnect(users.get(0));
     }
 
     /**

@@ -158,7 +158,9 @@ public class Backend {
 
         }
         else if (query.getMessage().equals("<disconnect />")) {
-            // Disconnect the socket
+            User user = userMap.get(socket);
+            ChatPane chatPane = chatMap.get(user);
+            chatPane.disconnectExternal();
         }
     }
 
@@ -287,9 +289,17 @@ public class Backend {
      * ChatPane that user has disconnected. Keep the ChatPane open.
      * @param socket The socket that should be closed. 
      */
-    private void disconnect(Socket socket) {
-
+    public void disconnect(User user) {
+        userList.remove(user);
+        connectedUsersCount--;
     }
+    
+    public void close(ChatPane chatPane, User user) {
+        userMap.remove(user.getClientSocket().getSocketID());
+        chatMap.remove(user);
+        tabbedPane.remove(chatPane);
+    }
+
 
     public void updateName(String newName) {
         if (newName.equals("")) {
