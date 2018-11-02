@@ -4,6 +4,7 @@
  */
 public class Query {
     private String message;
+    private String originalMessage = "";
 
     /**
      * Constructs only a simple message with a string.
@@ -12,11 +13,30 @@ public class Query {
         this.message = message;
     }
 
+    public Query(String message, String originalMessage) {
+        this(message);
+        this.originalMessage = originalMessage;
+    }
+
     /**
      * @return the message
      */
     public String getMessage() {
         return message;
+    }
+
+    /**
+     * @param originalMessage the originalMessage to set
+     */
+    public void setOriginalMessage(String originalMessage) {
+        this.originalMessage = originalMessage;
+    }
+
+    /**
+     * @return the originalMessage
+     */
+    public String getOriginalMessage() {
+        return originalMessage;
     }
 
     @Override
