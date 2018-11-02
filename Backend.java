@@ -175,7 +175,6 @@ public class Backend {
             JOptionPane.showMessageDialog(frame, "An user from " + user.getClientSocket().getSocketID() + " has tried to connect to you, but the max supported number of connections has been reached.");
         }
 
-        connectedUsersCount++;
         final Backend backendHere = this;
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -223,7 +222,7 @@ public class Backend {
         userList.add(newUser);
         userMap.put(socket.getSocketID(), newUser);
 
-        ChatPane newPane = new ChatPane(newUser);
+        ChatPane newPane = new ChatPane(this, newUser);
 
         chatMap.put(newUser, newPane);
         tabbedPane.addTab(name, newPane);
@@ -239,10 +238,12 @@ public class Backend {
     public void addConnectionAsServer(User user) {
         user.getClientSocket().send(Composer.composeRequestReply(myName, "yes"));
 
+        connectedUsersCount++;
+
         userList.add(user);
         userMap.put(user.getClientSocket().getSocketID(), user);
 
-        ChatPane newPane = new ChatPane(user);
+        ChatPane newPane = new ChatPane(this, user);
 
         chatMap.put(user, newPane);
         tabbedPane.addTab(user.getName(), newPane);

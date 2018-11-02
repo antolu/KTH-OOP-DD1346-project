@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
  * on its own, sending messages of all forms to the correct socket.
  */
 public class ChatPane extends JPanel {
+    private Backend backend;
     /** The window that displays all the messages */
     private ChatWindow chatWindow;
     /** The textfield where you type your messages */
@@ -54,7 +55,7 @@ public class ChatPane extends JPanel {
     /** If this JPanel is visible in the GUI currently or not. */
     private Boolean isVisible;
     /** The current global enryption type */
-    private String currentEncryptionType;
+    private String currentEncryptionType = "";
     /** Contains all the keys, each key corresponding to a type. <type,key>  */
     private HashMap<String, String> encryptionKeys;
 
@@ -65,7 +66,8 @@ public class ChatPane extends JPanel {
      * @param user The user this ChatPane should belong to
      * @param clientSocket The socket with which to communicate.
      */
-    public ChatPane(User user) {
+    public ChatPane(Backend backend, User user) {
+        this.backend = backend;
         this.user = user;
         this.clientSocket = user.getClientSocket();
 
@@ -159,10 +161,10 @@ public class ChatPane extends JPanel {
 
                 // Actually send the message to the socket(s)
                 if (encryptButton.getState()) {
-                    message = Composer.composeMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), user.getName());
+                    message = Composer.composeMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName());
                 }
                 else {
-                    message = Composer.composeMessage(message, currentColor, "", "", user.getName());
+                    message = Composer.composeMessage(message, currentColor, "", "", backend.getMyName());
                 }
 
                 for (SocketClient socket : sockets) {
@@ -209,7 +211,7 @@ public class ChatPane extends JPanel {
 
         disconnectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // Disconnect using backend or inform backend.
+                // Disconnect using backend or inform backend. SHOW CONFIRMATION!!!
             }
         });
     }
