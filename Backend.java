@@ -304,6 +304,7 @@ public class Backend {
         connectedUsersCount--;
 
         if (connectedUsersCount <= 0)
+            connectedUsersCount = 0;
             menuBar.disableDisconnectButton();
     }
     
