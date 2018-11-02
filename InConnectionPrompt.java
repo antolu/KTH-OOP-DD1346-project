@@ -41,13 +41,13 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
 
         JLabel text = new JLabel();
         text.setText("<html>" + user.getName() + " wants to connect to you. he says: <br> " + message + " <br> Do you accept? </html>");
-        text.setMaximumSize(new Dimension(200, 100));
-        text.setAlignmentX(Component.LEFT_ALIGNMENT);
+        text.setPreferredSize(new Dimension(220, 100));
+        // text.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         frame = new JFrame("New incoming connection");
 
-        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-        setPreferredSize(new Dimension(220, 160));
+        setLayout(new FlowLayout());
+        setPreferredSize(new Dimension(280, 160));
         add(text);
         add(buttonPanel);
 
