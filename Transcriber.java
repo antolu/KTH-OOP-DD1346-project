@@ -19,6 +19,11 @@ import java.net.InetSocketAddress;
 
 import java.util.Base64;
 
+import java.io.*;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.stream.*;
+
 /**
  * Translates incoming messages in byte or string form to a fully readable
  * message incapsulated in a Message object.
@@ -99,7 +104,9 @@ public class Transcriber {
                     return parseFileResponse((Element) message.getChildNodes().item(0));
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("disconnect"))
                     return new Query("<disconnect />");
-                return parseMessage(message);
+                else if (message.getAttribute("multipart").equals("start"))
+                    return new Query("<multipart start />");
+                return parseMessage(doc, message);
             }
             else if (message.getTagName() == "request") {
                 if (message.hasAttribute("reply")) {
@@ -117,7 +124,7 @@ public class Transcriber {
         }
     }
 
-    private static Message parseMessage(Element rootElement) {
+    private static Message parseMessage(Document origMessage, Element rootElement) {
         Element text = (Element) rootElement.getElementsByTagName("text").item(0);
         String textMessage = "";
 
@@ -138,7 +145,21 @@ public class Transcriber {
         String color = text.getAttribute("color");
         String time = dtf.format(LocalDateTime.now());
 
-        return new Message(decodeHTML(textMessage), color, time, rootElement.getAttribute("name"));
+        Message msg = new Message(decodeHTML(textMessage), color, time, rootElement.getAttribute("name"));
+
+        if (rootElement.hasAttribute("multipart")) {
+            String multipartAttribute = rootElement.getAttribute("multipart");
+            msg.setMultipartMode(multipartAttribute);
+            if (multipartAttribute.equals("client")) {
+                rootElement.setAttribute("multipart", "server");
+            }
+            else if (multipartAttribute.equals("server")) {
+                rootElement.setAttribute("multipart", "client");
+            }
+            msg.setOriginalMessage(getXML(origMessage));
+        }
+
+        return msg;
     }
 
     private static Request parseRequest(Element rootElement) {
@@ -213,15 +234,19 @@ public class Transcriber {
         return input;
     }
 
-    /**
-     * Constructs a message with the appropriate xml-tags
-     * @param msg, string with the content of the message to be sent
-     * @param color, string with the desired color of the message
-     * @param encryptionType, string with the desired encryption type, if any
-     * @param encryptionKey, string with the key to the selected crypt
-     * @return String, message to be sent with all needed xml-tags
-     */
-    public static String composeMessage(String msg, String color, String encryptionType, String encryptionKey) {
-        return msg;
+    private static String getXML(Document doc) {
+        try {
+            DOMSource domSource = new DOMSource(doc);
+            StringWriter writer = new StringWriter();
+            StreamResult result = new StreamResult(writer);
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.transform(domSource, result);
+            return writer.toString();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 }
