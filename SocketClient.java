@@ -101,6 +101,8 @@ public class SocketClient implements Runnable {
         while (clientSocket.isConnected()) {
             message = receive();
             System.err.println("Received message " + message);
+            if (message.equals(""))
+                continue;
 
             parsedMessage = Transcriber.parse(message, this);
 
