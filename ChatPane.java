@@ -61,16 +61,19 @@ public class ChatPane extends JPanel {
     private HashMap<String, String> encryptionKeys;
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private Boolean isMultipartServer = false;
+    private Boolean isMultipartClient = false;
 
     /**
      * Basic constructor.
      * @param user The user this ChatPane should belong to
      * @param clientSocket The socket with which to communicate.
      */
-    public ChatPane(Backend backend, User user) {
+    public ChatPane(Backend backend, User user , Boolean isMultipartClient) {
         this.backend = backend;
         this.user = user;
         this.clientSocket = user.getClientSocket();
+        this.isMultipartClient = isMultipartClient;
 
         users = new ArrayList<>();
         sockets = new ArrayList<>();
@@ -81,6 +84,27 @@ public class ChatPane extends JPanel {
 
         createGUI();
         addActionListeners(this);
+    }
+
+    /**
+     * Creates a multipart chat
+     * @param backend
+     * @param users
+     */
+    public ChatPane(Backend backend, List<User> users) {
+        this.backend = backend;
+        this.users = users;
+
+        isMultipartServer = true;
+
+        users = new ArrayList<>();
+        sockets = new ArrayList<>();
+        encryptionKeys = new HashMap<>();
+
+        createGUI();
+        disconnectButton.setEnabled(false);
+        closeButton.setEnabled(false);
+        sendFileButton.setEnabled(false);
     }
 
     private void createGUI() {
@@ -167,15 +191,34 @@ public class ChatPane extends JPanel {
 
 
                 // Actually send the message to the socket(s)
-                if (encryptButton.getState()) {
-                    message = Composer.composeMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName());
+                if (isMultipartServer) {
+                    if (encryptButton.getState()) {
+                        message = Composer.composeMultiPartMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName(), "server");
+                    }
+                    else {
+                        message = Composer.composeMultiPartMessage(message, currentColor, "", "", backend.getMyName(), "server");
+                    }
+                }
+                else if(isMultipartClient) {
+                    if (encryptButton.getState()) {
+                        message = Composer.composeMultiPartMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName(), "client");
+                    }
+                    else {
+                        message = Composer.composeMultiPartMessage(message, currentColor, "", "", backend.getMyName(), "client");
+                    }
                 }
                 else {
-                    message = Composer.composeMessage(message, currentColor, "", "", backend.getMyName());
+                    if (encryptButton.getState()) {
+                        
+                        message = Composer.composeMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName());
+                    }
+                    else {
+                        message = Composer.composeMessage(message, currentColor, "", "", backend.getMyName());
+                    }
                 }
 
-                for (SocketClient socket : sockets) {
-                    socket.send(message);
+                for (User user : users) {
+                    user.getClientSocket().send(message);
                 }
             }
         });
@@ -243,6 +286,14 @@ public class ChatPane extends JPanel {
         });
     }
 
+    public void addUser(User user) {
+        users.add(user);
+    }
+    
+    public void removeUser(User user) {
+        users.remove(user);
+    }
+
     private void close() {
         if (sendButton.isEnabled()) 
             disconnect();
@@ -256,6 +307,16 @@ public class ChatPane extends JPanel {
     }
 
     public void disconnectExternal() {
+        disable();
+
+        chatWindow.addMessage(new Message(users.get(0) + " disconnected.", "000000", "", ""));
+        users.get(0).getClientSocket().close();
+
+        backend.disconnect(users.get(0));
+    }
+
+    @Override
+    public void disable() {
         sendButton.setEnabled(false);
         sendFileButton.setEnabled(false);
         setEncryptionButton.setEnabled(false);
@@ -264,10 +325,6 @@ public class ChatPane extends JPanel {
         setColorButton.setEnabled(false);
         msgField.setEditable(false);
 
-        chatWindow.addMessage(new Message(users.get(0) + " disconnected.", "000000", "", ""));
-        users.get(0).getClientSocket().close();
-
-        backend.disconnect(users.get(0));
     }
 
     /**
