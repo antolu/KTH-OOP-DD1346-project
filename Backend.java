@@ -288,7 +288,7 @@ public class Backend {
     public void disconnectAll() {
         for (User user : userList)
         {
-            disconnect(user);
+            chatMap.get(user).disconnectExternal();
         }
     }
 
