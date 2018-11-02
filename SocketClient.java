@@ -56,7 +56,6 @@ public class SocketClient implements Runnable {
             String inputLine;
             if ((inputLine = in.readLine()) != null) {
                 string.append(inputLine);
-                System.err.println(inputLine);
             }
         }
         catch (IOException e ) {
