@@ -155,6 +155,7 @@ public class ChatPane extends JPanel {
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String message = msgField.getText();
+                msgField.setText("");
                 Message msg = new Message(message, currentColor, dtf.format(LocalDateTime.now()), "Me");
                 chatWindow.sentMessage(msg);
 
