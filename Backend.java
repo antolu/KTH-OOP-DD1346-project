@@ -158,7 +158,7 @@ public class Backend {
 
         }
         else if (query.getMessage().equals("<disconnect />")) {
-            User user = userMap.get(socket);
+            User user = userMap.get(socket.getSocketID());
             ChatPane chatPane = chatMap.get(user);
             chatPane.disconnectExternal();
         }
@@ -303,7 +303,7 @@ public class Backend {
         userList.remove(user);
         connectedUsersCount--;
 
-        if (connectedUsersCount == 0)
+        if (connectedUsersCount <= 0)
             menuBar.disableDisconnectButton();
     }
     

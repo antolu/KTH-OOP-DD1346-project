@@ -251,7 +251,7 @@ public class ChatPane extends JPanel {
     }
 
     private void disconnect() {
-        sockets.get(0).send(Composer.getDisconnectMessage());
+        users.get(0).getClientSocket().send(Composer.getDisconnectMessage());
         disconnectExternal();
     }
 
@@ -260,11 +260,12 @@ public class ChatPane extends JPanel {
         sendFileButton.setEnabled(false);
         setEncryptionButton.setEnabled(false);
         encryptButton.setEnabled(false);
+        disconnectButton.setEnabled(false);
         setColorButton.setEnabled(false);
         msgField.setEditable(false);
 
         chatWindow.addMessage(new Message(users.get(0) + " disconnected.", "000000", "", ""));
-        sockets.get(0).close();
+        users.get(0).getClientSocket().close();
 
         backend.disconnect(users.get(0));
     }
