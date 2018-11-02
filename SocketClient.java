@@ -54,7 +54,7 @@ public class SocketClient implements Runnable {
 
         try {
             String inputLine;
-            while ((inputLine = in.readLine()) != null) {
+            if ((inputLine = in.readLine()) != null) {
                 string.append(inputLine);
             }
         }
