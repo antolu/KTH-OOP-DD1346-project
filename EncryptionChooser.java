@@ -79,10 +79,10 @@ public class EncryptionChooser extends JPanel implements ActionListener {
         if (e.getSource() == okButton) {
             JButton source = (JButton) e.getSource();
 
-            frame.setVisible(false);
+            // frame.setVisible(false);
 
             for (JRadioButton button : radioButtons) {
-                if (button.getText().equals("AES")) {
+                if (button.isSelected() && button.getText().equals("AES")) {
                     /* Generate key */
                     try {
                         KeyGenerator kgen = KeyGenerator.getInstance("AES");
@@ -98,7 +98,7 @@ public class EncryptionChooser extends JPanel implements ActionListener {
                     frame.dispose();
                     return;
                 }
-                else if (button.getText().equals("Caesar")) {
+                else if (button.isSelected() && button.getText().equals("Caesar")) {
                     String key = keyField.getText();
                     try { // Check if key is actually an integer
                         Integer.parseInt(key);
@@ -117,10 +117,10 @@ public class EncryptionChooser extends JPanel implements ActionListener {
                     frame.dispose();
                     return;
                 }
-                else if (button.getText().equals("RSA")) {
+                else if (button.isSelected() && button.getText().equals("RSA")) {
                     System.err.println("RSA selected.");
                 }
-                else if (button.getText().equals("Blowfish")) {
+                else if (button.isSelected() && button.getText().equals("Blowfish")) {
                     System.err.println("Blowfish selected.");
                 }
             }

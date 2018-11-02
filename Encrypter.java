@@ -1,6 +1,8 @@
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
+import java.util.Base64;
 
 import java.lang.Integer;
 import java.lang.String;
@@ -96,9 +98,9 @@ public class Encrypter {
     }
 
     private static byte[] decryptAES(String key, byte[] toDecrypt) throws Exception {
-        // byte[] decodedKey = Base64.getDecoder().decode(encodedKey);
-        // SecretKey originalKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
-        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
+        byte[] decodedKey = Base64.getDecoder().decode(key);
+        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
+        // SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES");
 
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
@@ -139,7 +141,10 @@ public class Encrypter {
     }
 
     private static byte[] encryptAES(String key, byte[] toEncrypt) throws Exception {
-        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
+        // SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
+        byte[] decodedKey = Base64.getDecoder().decode(key);
+        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
+
         Cipher cipher = Cipher.getInstance("AES");
 
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
