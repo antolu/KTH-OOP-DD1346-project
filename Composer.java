@@ -73,6 +73,49 @@ public class Composer {
         return sb.toString();
     }
 
+    public static String composeMultiPartMessage(String message, String color, String encryptionType, String encryptionKey, String name, String serverclient) {
+        StringBuilder sb = new StringBuilder();
+        /* <message> */
+        sb.append("<message");
+        if (!color.equals("")) {
+            sb.append(" name=\"");
+            sb.append(name);
+            sb.append("\"");
+        }
+        sb.append(" multipart=\"");
+        sb.append(serverclient);
+        sb.append("\"");
+        sb.append(">");
+
+        /* <text> */
+        sb.append("<text");
+        if (!color.equals("")) {
+            sb.append(" color=\"");
+            sb.append(color);
+            sb.append("\"");
+        }
+        sb.append(">");
+
+        /* <encrypted> */
+        if (!encryptionType.equals("")) {
+            sb.append("<encrypted type=\"");
+            sb.append(encryptionType);
+            sb.append("\"");
+            sb.append(" key=\"");
+            sb.append(encryptionKey);
+            sb.append("\">");
+            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionType, Transcriber.stringToByte(Transcriber.encodeHTML(message)))));
+            sb.append("</encrypted>");
+        }
+        else {
+            sb.append(Transcriber.encodeHTML(message));
+        }
+        sb.append("</text>");
+        sb.append("</message>");
+
+        return sb.toString();
+    }
+
     public static String composeFileRequest(String message, String filename, String filesize, String port, String encryptionType, String encryptionKey) {
         StringBuilder sb = new StringBuilder();
 
