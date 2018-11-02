@@ -10,7 +10,7 @@ import java.lang.Character;
 import java.util.HashMap;
 
 public class Encrypter {
-    public static final String[] SUPPORTED_ENCRYPTIONS = {"AES", "caesar"};
+    public static final String[] SUPPORTED_ENCRYPTIONS = {"AES", "Caesar"};
     private static final char[] lowercase = {'a', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
         'v', 'w', 'x', 'y', 'z', 'a', 'a', 'o'};
