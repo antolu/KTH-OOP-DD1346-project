@@ -80,7 +80,7 @@ public class MenuBar extends JPanel {
                     "Exit Confirmation", JOptionPane.YES_NO_OPTION, 
                     JOptionPane.QUESTION_MESSAGE, null, null, null);
                 if (confirm == 0) {
-                    backend.disconnect();
+                    backend.disconnectAll();
                 }
             }
         });

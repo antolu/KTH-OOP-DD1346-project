@@ -225,6 +225,8 @@ public class Backend {
         userList.add(newUser);
         userMap.put(socket.getSocketID(), newUser);
 
+        menuBar.enableDisconnectButton();
+
         ChatPane newPane = new ChatPane(this, newUser);
 
         chatMap.put(newUser, newPane);
@@ -242,6 +244,7 @@ public class Backend {
         user.getClientSocket().send(Composer.composeRequestReply(myName, "yes"));
 
         connectedUsersCount++;
+        menuBar.enableDisconnectButton();
 
         userList.add(user);
         userMap.put(user.getClientSocket().getSocketID(), user);
@@ -281,6 +284,13 @@ public class Backend {
             }
         }).start();
     }
+    
+    public void disconnectAll() {
+        for (User user : userList)
+        {
+            disconnect(user);
+        }
+    }
 
     /**
      * Disconnects the socket in the argument, sending a
@@ -292,6 +302,9 @@ public class Backend {
     public void disconnect(User user) {
         userList.remove(user);
         connectedUsersCount--;
+
+        if (connectedUsersCount == 0)
+            menuBar.disableDisconnectButton();
     }
     
     public void close(ChatPane chatPane, User user) {
