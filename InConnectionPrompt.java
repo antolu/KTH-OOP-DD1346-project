@@ -63,6 +63,7 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
             backend.addConnectionAsServer(user);
         } else if (e.getSource() == denyButton) {
             user.getClientSocket().send(Composer.composeRequestReply(backend.getMyName(), "no"));
+            user.getClientSocket().close();
         }
 
     }
