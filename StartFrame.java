@@ -79,7 +79,7 @@ public class StartFrame extends Observable implements ActionListener {
         System.out.println("Port: " + port);
 
         // Return socket to parent
-        Main.startMainFrame(new ourStruct(port, name, serverSocket));
+        Main.startMainFrame(port, name, serverSocket);
     }
 
     private void showError(int port) {

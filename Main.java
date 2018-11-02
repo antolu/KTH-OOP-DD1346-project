@@ -1,6 +1,6 @@
 import java.io.*;
 import java.util.*;
-
+import java.net.ServerSocket;
 import java.net.Socket;
 
 import javax.swing.JFrame;
@@ -49,7 +49,31 @@ public class Main {
         // }
 
 
-        new StartFrame();
+        // new StartFrame();
+
+        if (args.length < 2) 
+            System.exit(1);
+        String name = args[0];
+        int port = 0;
+        try {
+            port = Integer.parseInt(args[1]);
+        } catch (NumberFormatException e) {
+            System.exit(1);
+        }
+
+        /* Socket */
+        ServerSocket serverSocket = null;
+        try {
+            serverSocket = new ServerSocket(port);
+        }
+        catch (IOException e) {
+            System.err.println("Failed to bind to port");
+            System.exit(1);
+        }
+
+        new Backend(port, name, serverSocket);
+
+
         // String message = getMessage();
         // Encrypter.initialize();
         // Query parsedMessage = Transcriber.parse(message);
@@ -57,7 +81,7 @@ public class Main {
         // System.out.println(parsedMessage);
     }
 
-    public static void startMainFrame(ourStruct info) {
-        new Backend(info);
+    public static void startMainFrame(int port, String name, ServerSocket serverSocket) {
+        new Backend(port, name, serverSocket);
     }
 }

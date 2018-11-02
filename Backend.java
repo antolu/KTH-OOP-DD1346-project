@@ -66,15 +66,15 @@ public class Backend {
      * name, port, serversocket and whether the backend is started as server
      * or client.
      */
-    public Backend(ourStruct info) {
+    public Backend(int port, String name, ServerSocket serverSocket) {
         Encrypter.initialize();
         chatMap = new HashMap<User, ChatPane>();
         userMap = new HashMap<String, User>();
         userList = new ArrayList<User>();
 
-        myName = info.getName();
-        port = info.getPort();
-        serverSocket = info.getServerSocket();
+        myName = name;
+        this.port = port;
+        this.serverSocket = serverSocket;
 
         createGUI();
         waitForConnections(this);
