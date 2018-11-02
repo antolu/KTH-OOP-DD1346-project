@@ -60,7 +60,7 @@ public class Composer {
             sb.append("\"");
             sb.append(" key=\"");
             sb.append(encryptionKey);
-            sb.append("\"");
+            sb.append("\">");
             sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionType, Transcriber.stringToByte(Transcriber.encodeHTML(message)))));
             sb.append("</encrypted>");
         }
