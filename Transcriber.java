@@ -250,32 +250,6 @@ public class Transcriber {
         return new FileResponse(textMessage, reply);
         // Handle it. <fileresponse reply="" ></fileresponse>
     }
-    
-    /**
-     * Turns HTML names into symbols
-     * @param String input, received message with HTML names 
-     * @return String, message to be displayed
-     */
-    private static String unescapeHtml4(String input) {
-        input.replaceAll("&quot", "\"");
-        input.replaceAll("&amp", "&");
-        input.replaceAll("&lt", "<");
-        input.replaceAll("&gt", ">");
-        return input;
-    }
-    
-    /**
-     * Turns symbols into HTML names in a message to be sent
-     * @param String input, message written in GUI
-     * @return String, message to be sent with HTML names
-     */
-    public static String encodeHTML(String input) {
-        input.replaceAll("\"", "&quot");
-        input.replaceAll("&", "&amp");
-        input.replaceAll("<", "&lt");
-        input.replaceAll(">", "&gt");
-        return input;
-    }
 
     /**
      * Converts a Document to human readable string (one line XML).
