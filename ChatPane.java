@@ -8,20 +8,25 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
 
 import java.awt.Component;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import java.io.File;
+
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import java.time.format.DateTimeFormatter;  
-import java.time.LocalDateTime;    
+import java.time.LocalDateTime;
 
 /**
  * The class responsible for each chat window for every chat/user.
@@ -233,11 +238,73 @@ public class ChatPane extends JPanel {
             }
         });
 
-        sendFileButton.addActionListener(new ActionListener() {
+       /* sendFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run(){
+                        final JFileChooser jfc = new JFileChooser();
+                        int returnValue = jfc.showOpenDialog(null);
+                        File selectedFile;
+                        int portNumber;
+                        int max = 8000;
+                        int min = 4000;
+                        boolean foundPort = false;
+                        boolean isEncrypted;
+                        String encrType;
+                        String encrKey;
+
+                        ServerSocket fileSocket= null;
+
+                        JFrame messageFrame = new JFrame();
+                        JTextField sendMessageText = new JTextField();
+                        sendMessageText.setPreferredSize(new Dimension(200,40));
+                        JLabel messageLabel = new JLabel("Write a message to accompany the file");
+                        JButton sendMessageB = new JButton("Send");
+
+                        if(returnValue == JFileChooser.APPROVE_OPTION){
+                            selectedFile = jfc.getSelectedFile();
+
+                            sendButton.addActionListener(new ActionListener(){
+                                public void actionPerformed(ActionEvent e){
+
+                                    Random randNumbr = new Random();
+
+                                    while(!foundPort){
+                                        portNumber = randNumbr.nextInt((max-min)+1)+min;
+
+                                        try{
+                                            fileSocket = new ServerSocket(portNumber);
+                                            foundPort = true;
+                                        }catch(IOException e) {
+                                            System.out.println("Failed to bind to port");
+                                        }
+                                    }
+                                    messageFrame.dispose();
+
+                                    FileHandler fileHandler = new FileHandler()
+                                  //  FileHandler.sendFileRequest(fileSocket, users.get(0).getClientSocket(), text.getText(),
+                                  //          portNumber, selectedFile,);
+                                }
+                            });
+
+                            frame.add(text);
+                            frame.add(myLabel);
+                            frame.add(sendButton);
+
+                            frame.setLayout(new FlowLayout());
+                            frame.setSize(300,200);
+                            frame.setVisible(true);
+                        }
+
+                            //System.out.println(selectedFile.getAbsolutePath());
+                        }
+
+                    }
+                });
+
                 // Open up the file selection dialog
             }
-        });
+        });*/
 
         disconnectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
