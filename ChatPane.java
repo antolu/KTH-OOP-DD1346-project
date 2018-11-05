@@ -116,6 +116,11 @@ public class ChatPane extends JPanel {
         disconnectButton.setEnabled(false);
         closeButton.setEnabled(false);
         sendFileButton.setEnabled(false);
+
+        /* Start multipart on all clients also */
+        for (User user : users) {
+            user.getClientSocket().send("<message><multipartstart></message>");
+        }
     }
 
     private void createGUI() {
@@ -374,6 +379,7 @@ public class ChatPane extends JPanel {
     }
 
     public void addUser(User user) {
+        user.getClientSocket().send("<message><multipartstart></message>");
         addMessage(new Message(user + "connected."));
         users.add(user);
     }
