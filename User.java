@@ -14,7 +14,10 @@ public class User {
     private SocketClient clientSocket;
 
     public User(String name, String ID) {
-        this.name = name;
+        if (name.equals(""))    
+            name = ID;
+        else 
+            this.name = name;
         this.ID = ID;
     }
 
