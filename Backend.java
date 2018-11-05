@@ -393,4 +393,11 @@ public class Backend {
     public String getMyName() {
         return myName;
     }
+
+    /**
+     * @return the port
+     */
+    public int getPort() {
+        return port;
+    }
 }

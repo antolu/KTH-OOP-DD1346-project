@@ -90,27 +90,33 @@ public class OutConnectionPrompt extends JPanel implements ActionListener {
         String errorMsg = "";
 
         /* Get IP */
-        if (IPField.getText().equals("")) {
+        String IPString = IPField.getText();
+        if (IPString.equals("")) {
             hasErrors = true;
             errorMsg += "The IP adress field cannot be left empty <br>";
         }
         InetAddress IP = null;
         try {
-            IP = InetAddress.getByName(IPField.getText());
+            IP = InetAddress.getByName(IPString);
         }
         catch (UnknownHostException ex) {
             hasErrors = true;
-            errorMsg += "The entered IP adress " + IPField.getText() + " is not a valid IP adress. <br>";
+            errorMsg += "The entered IP adress " + IPString + " is not a valid IP adress. <br>";
         }
 
         /* Get port */
         int port = 0;
+        String portString = portField.getText();
         try {
-            port = Integer.parseInt(portField.getText());
+            port = Integer.parseInt(portString);
         } 
         catch (NumberFormatException ex) {
             hasErrors = true;
-            errorMsg += "The entered port " + portField.getText() + " is not a valid port. <br>";
+            errorMsg += "The entered port " + portString + " is not a valid port. <br>";
+        }
+
+        if ((IPString.equals("127.0.0.1") || IPString.equals("localhost")) && port == backend.getPort()) {
+            errorMsg += "You cannot connect to yourself!";
         }
 
         if (hasErrors) {
