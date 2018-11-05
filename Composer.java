@@ -187,6 +187,22 @@ public class Composer {
         return sb.toString();
     }
 
+    public static String composeKeyRequestResponse(String key) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<message>");
+
+        /* <keyrequest> */
+        sb.append("<keyrequest key=\"");
+        sb.append(key);
+        sb.append("\"");
+        sb.append(">");
+        sb.append("</keyrequest>");
+
+        sb.append("</message>");
+
+        return sb.toString();
+    }
+
     public static String getDisconnectMessage() {
         return "<message><disconnect /></message>";
     }
