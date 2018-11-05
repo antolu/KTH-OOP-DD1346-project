@@ -40,7 +40,7 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
         buttonPanel.add(denyButton);
 
         JLabel text = new JLabel();
-        text.setText("<html>" + user.getName() + " wants to connect to you. he says: <br> " + message + " <br> Do you accept? </html>");
+        text.setText("<html>" + user.getName() + " wants to connect to you. Hen says: <br> " + message + " <br> Do you accept? </html>");
         text.setPreferredSize(new Dimension(220, 100));
         // text.setAlignmentX(Component.LEFT_ALIGNMENT);
 
