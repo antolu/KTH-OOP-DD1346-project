@@ -112,6 +112,7 @@ public class ChatPane extends JPanel {
         encryptionKeys = new HashMap<>();
 
         createGUI();
+        addActionListeners(this);
         disconnectButton.setEnabled(false);
         closeButton.setEnabled(false);
         sendFileButton.setEnabled(false);
