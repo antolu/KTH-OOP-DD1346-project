@@ -178,10 +178,12 @@ public class Backend {
         else if (query.getMessage().equals("<disconnect />")) {
             User user = userMap.get(socket.getSocketID());
             ChatPane chatPane = chatMap.get(user);
+            chatPane.addMessage(new Message(user + " disconnected.", "000000", "", ""));
             chatPane.disconnectExternal();
 
             if (multiPartPane != null) {
                 multiPartPane.addMessage(new Message(user.getName() + " disconnected."));
+                multiPartPane.removeUser(user);
             }
         }
         else if (query.getMessage().equals("<multipart start />")) {
