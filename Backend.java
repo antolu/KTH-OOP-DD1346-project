@@ -313,6 +313,14 @@ public class Backend {
      * @param connectionRequest The message encapsulated in the connection request.
      */
     public void addNewConnection(Socket socket) {
+        if (userList.size() >= MAX_CONNECTIONS) {
+            JOptionPane.showMessageDialog(frame, "An user from " + socket.getRemoteSocketAddress() + " has tried to connect to you, but the max supported number of connections has been reached.");
+            try {
+                socket.close();
+            } catch (IOException e) {
+
+            }
+        }
         SocketClient newSocket = new SocketClient(socket, this);
 
         newSocket.start();
