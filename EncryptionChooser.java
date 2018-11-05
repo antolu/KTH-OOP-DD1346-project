@@ -22,6 +22,10 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.awt.Dimension;
 
+/**
+ * Displays a popup window allowing the user to select an encryption type, 
+ * and a key if applicable.
+ */
 public class EncryptionChooser extends JPanel implements ActionListener {
     private ChatPane chatPane;
     private JFrame frame;
@@ -29,17 +33,23 @@ public class EncryptionChooser extends JPanel implements ActionListener {
     private JButton okButton;
     private List<JRadioButton> radioButtons;
     
+    /**
+     * Creates and displays the GUI 
+     * @param chatPane The parent ChatPane object. Used to set encryption after
+     * it has been selected.
+     */
     public EncryptionChooser(ChatPane chatPane) {
         this.chatPane = chatPane;
 
+        /* Set layout */
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        // setLayout(new BorderLayout());
         setPreferredSize(new Dimension(150, Encrypter.SUPPORTED_ENCRYPTIONS.length * 50 + 100));
 
-        /* ADd some form of caption */
+        /* Add some form of caption */
         JLabel label = new JLabel();
         label.setText("<html><br>Enter encryption key if Caesar is to be selected.<br></html>");
 
+        /* Text field to enter keyf or caesar encryption */
         keyField = new JTextField();
         keyField.setPreferredSize(new Dimension(150, 30));
 
@@ -58,9 +68,9 @@ public class EncryptionChooser extends JPanel implements ActionListener {
         for (JRadioButton button: radioButtons) {
             buttonGroup.add(button);
             add(button);
-            // button.addActionListener(this);
         }
 
+        /* Add a an ok button to set encryption */
         okButton = new JButton();
         okButton.setText("OK");
         okButton.setPreferredSize(new Dimension(60, 30));
@@ -68,6 +78,7 @@ public class EncryptionChooser extends JPanel implements ActionListener {
 
         add(okButton);
 
+        /* Display GUI */
         frame = new JFrame("Encryption chooser"); 
 
         frame.add(this);
@@ -75,6 +86,10 @@ public class EncryptionChooser extends JPanel implements ActionListener {
         frame.setVisible(true);
     }
 
+    /**
+     * Standard actionPerformed. Sets encryption when OK button is pressed.
+     * @param e The ActionEvent.
+     */
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == okButton) {
             JButton source = (JButton) e.getSource();
@@ -83,46 +98,52 @@ public class EncryptionChooser extends JPanel implements ActionListener {
 
             for (JRadioButton button : radioButtons) {
                 if (button.isSelected() && button.getText().equals("AES")) {
-                    /* Generate key */
                     try {
+                        /* Generate key */
                         KeyGenerator kgen = KeyGenerator.getInstance("AES");
                         kgen.init(128);
                         SecretKey aesKey = kgen.generateKey();
                         String encodedKey = Base64.getEncoder().encodeToString(aesKey.getEncoded());
             
-                        keyField.setText(encodedKey);
-            
+                        /* Set encryption in chatPane */
                         chatPane.updateEncryption("AES", encodedKey);
                     } catch (NoSuchAlgorithmException ex) {
+                        // Do nothing / will not fail
                     }
                     frame.dispose();
                     return;
                 }
                 else if (button.isSelected() && button.getText().equals("Caesar")) {
                     String key = keyField.getText();
-                    try { // Check if key is actually an integer
-                        Integer.parseInt(key);
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(frame, "The entered encryption key " + key + " is not an integer.");
-                        frame.setVisible(true);
-                        return;
-                    }
-                    if (key.equals("")) { // Check if there is actually a key entered.
+
+                    /* Check if there is actually a key entered */
+                    if (key.equals("")) {
                         JOptionPane.showMessageDialog(frame, "Please enter a valid key.");
                         frame.setVisible(true);
                         return;
                     }
+
+                    /* Check if actually an integer */
+                    try {
+                        Integer.parseInt(key);
+                    } catch (NumberFormatException ex) {
+                        /* Show error */
+                        JOptionPane.showMessageDialog(frame, "The entered encryption key " + key + " is not an integer.");
+                        frame.setVisible(true);
+                        return;
+                    }
         
+                    /* Set encryption in chatPane */
                     chatPane.updateEncryption("caesar", key);
                     frame.dispose();
                     return;
                 }
-                else if (button.isSelected() && button.getText().equals("RSA")) {
-                    System.err.println("RSA selected.");
-                }
-                else if (button.isSelected() && button.getText().equals("Blowfish")) {
-                    System.err.println("Blowfish selected.");
-                }
+                // else if (button.isSelected() && button.getText().equals("RSA")) {
+                //     System.err.println("RSA selected.");
+                // }
+                // else if (button.isSelected() && button.getText().equals("Blowfish")) {
+                //     System.err.println("Blowfish selected.");
+                // }
             }
         }
     }
