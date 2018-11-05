@@ -1,5 +1,6 @@
 import java.lang.StringBuilder;
 import java.lang.String;
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 /**
  * Convenience class with static methods to compose all required messages
@@ -20,7 +21,7 @@ public class Composer {
             sb.append("\"");
         }
         sb.append(">");
-        sb.append(Transcriber.encodeHTML(message));
+        sb.append(escapeHtml4(message));
         sb.append("</request>");
 
         return sb.toString();
@@ -85,15 +86,16 @@ public class Composer {
             sb.append(" key=\"");
             sb.append(encryptionKey);
             sb.append("\">");
-            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionType, Transcriber.stringToByte(Transcriber.encodeHTML(message)))));
+            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionType, Transcriber.stringToByte(escapeHtml4(message)))));
             sb.append("</encrypted>");
         }
         else {
-            sb.append(Transcriber.encodeHTML(message));
+            sb.append(escapeHtml4(message));
         }
         sb.append("</text>");
         sb.append("</message>");
 
+        System.err.println(sb.toString());
         return sb.toString();
     }
 
@@ -139,11 +141,11 @@ public class Composer {
             sb.append(" key=\"");
             sb.append(encryptionKey);
             sb.append("\">");
-            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionType, Transcriber.stringToByte(Transcriber.encodeHTML(message)))));
+            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionType, Transcriber.stringToByte(escapeHtml4(message)))));
             sb.append("</encrypted>");
         }
         else {
-            sb.append(Transcriber.encodeHTML(message));
+            sb.append(escapeHtml4(message));
         }
         sb.append("</text>");
         sb.append("</message>");
@@ -191,7 +193,7 @@ public class Composer {
             sb.append("\"");
         }
         sb.append(">");
-        sb.append(Transcriber.encodeHTML(message));
+        sb.append(escapeHtml4(message));
         sb.append("</filerequest>");
         sb.append("</message>");
 
@@ -213,7 +215,7 @@ public class Composer {
         sb.append(reply);
         sb.append("\"");
         sb.append(">");
-        sb.append(Transcriber.encodeHTML(message));
+        sb.append(escapeHtml4(message));
         sb.append("</fileresponse>");
 
         sb.append("</message>");
@@ -236,7 +238,7 @@ public class Composer {
         sb.append(type);
         sb.append("\"");
         sb.append(">");
-        sb.append(Transcriber.encodeHTML(message));
+        sb.append(escapeHtml4(message));
         sb.append("</keyrequest>");
 
         sb.append("</message>");

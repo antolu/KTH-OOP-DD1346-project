@@ -33,6 +33,10 @@ public class ChatWindow extends JEditorPane {
     /** A list of all the received messages */
     private List<Message> messages;
 
+    /**
+     * Creates the initial view when another person connects.
+     * @param otherUser The other user, extract name from this object.
+     */
     public ChatWindow(User otherUser) {
         try {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();

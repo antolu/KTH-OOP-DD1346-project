@@ -99,7 +99,7 @@ public class Backend {
                     "Exit Confirmation", JOptionPane.YES_NO_OPTION, 
                     JOptionPane.QUESTION_MESSAGE, null, null, null);
                 if (confirm == 0) {
-                    disconnect();
+                    disconnectAll();
                     System.exit(0);
                 }
             }

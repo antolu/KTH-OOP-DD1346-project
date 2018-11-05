@@ -373,6 +373,7 @@ public class ChatPane extends JPanel {
     }
 
     public void addUser(User user) {
+        addMessage(new Message(user + "connected."));
         users.add(user);
     }
     

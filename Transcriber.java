@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.net.InetSocketAddress;
 
 import java.util.Base64;
+import static org.apache.commons.text.StringEscapeUtils.unescapeHtml4;
 
 import java.io.*;
 import javax.xml.transform.*;
@@ -88,6 +89,7 @@ public class Transcriber {
      * @return Message, the received message parsed
      */
     public static Query parse(String msg, SocketClient socket) {
+        msg = unescapeHtml4(msg);
         msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + msg;
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
 
@@ -124,10 +126,19 @@ public class Transcriber {
         }
     }
 
+    /**
+     * Parses a message as a text message.
+     * @param origMessage The original message, to be included in the 
+     * generated Message object.
+     * @param rootElement The root element of the message document.
+     * @return Returns a Message object with all the information available
+     * for the message. 
+     */
     private static Message parseMessage(Document origMessage, Element rootElement) {
         Element text = (Element) rootElement.getElementsByTagName("text").item(0);
         String textMessage = "";
 
+        /* If there are encrypted elements in the message, decrypt and append */
         if (text.getElementsByTagName("encrypted").item(0) != null) {
             NodeList childNodes = text.getChildNodes();
 
@@ -142,14 +153,19 @@ public class Transcriber {
             textMessage = text.getTextContent();
         }
 
+        /* Retrieve other information from the code */
         String color = text.getAttribute("color");
         String time = dtf.format(LocalDateTime.now());
 
-        Message msg = new Message(decodeHTML(textMessage), color, time, rootElement.getAttribute("name"));
+        Message msg = new Message(unescapeHtml4(textMessage), color, time, rootElement.getAttribute("name"));
 
+        /* If is a multipart message, swap client/server attribute and
+         * add to the message
+         */
         if (rootElement.hasAttribute("multipart")) {
             String multipartAttribute = rootElement.getAttribute("multipart");
             msg.setMultipartMode(multipartAttribute);
+
             if (multipartAttribute.equals("client")) {
                 rootElement.setAttribute("multipart", "server");
             }
@@ -162,13 +178,23 @@ public class Transcriber {
         return msg;
     }
 
+    /**
+     * Parses a message as a connection request. 
+     * @param rootElement The root element of the XML message.
+     * @return A Request object with all available information encapsulated.
+     */
     private static Request parseRequest(Element rootElement) {
         String textMessage = rootElement.getTextContent();
         String name = rootElement.getAttribute("name");
 
-        return new Request(decodeHTML(textMessage), name);
+        return new Request(unescapeHtml4(textMessage), name);
     }
 
+    /**
+     * Parses a message as a response to a connection request.
+     * @param rootElement The root element of the XML message.
+     * @return A RequestResponse object with the reply.
+     */
     private static RequestResponse parseRequestResponse(Element rootElement) {
         String reply = rootElement.getAttribute("reply");
         String name = rootElement.getAttribute("name");
@@ -176,16 +202,28 @@ public class Transcriber {
         return new RequestResponse(name, reply);
     }
 
+    /**
+     * Parses a message as an encryption key request.
+     * @param rootElement The root element of the XML message.
+     * @return A KeyRequest object with the message and encryption type 
+     * encapsulated.
+     */
     private static KeyRequest parseKeyRequest(Element rootElement) {
         String textMessage = rootElement.getTextContent();
         String encryptionType = rootElement.getAttribute("type");
 
-        return new KeyRequest(decodeHTML(textMessage), encryptionType);
+        return new KeyRequest(unescapeHtml4(textMessage), encryptionType);
         // <keyrequest type="">Something</keyrequest>
     }
 
+    /**
+     * Parses a message as a file request. 
+     * @param rootElement The root element of the XML message.
+     * @param socket The socket where the message originated from.
+     * @return A FileRequest object with all available information encapsulated.
+     */
     private static FileRequest parseFileRequest(Element rootElement, SocketClient socket) {
-        String textMessage = decodeHTML(rootElement.getTextContent());
+        String textMessage = unescapeHtml4(rootElement.getTextContent());
         String filesize = rootElement.getAttribute("size");
         String filename = rootElement.getAttribute("name");
         String port = rootElement.getAttribute("port");
@@ -196,8 +234,13 @@ public class Transcriber {
         // Handle the file request, <filerequest name="" size="" type="" key=""></filerequest>
     }
 
+    /**
+     * Parses a message as a file transfer response.
+     * @param rootElement The root element of the XML message.
+     * @return A FileResponse object with reply encapsulated.
+     */
     private static FileResponse parseFileResponse(Element rootElement) {
-        String textMessage = decodeHTML(rootElement.getTextContent());
+        String textMessage = unescapeHtml4(rootElement.getTextContent());
         String reply = rootElement.getAttribute("reply");
 
         if (reply.equals("")) {
@@ -207,33 +250,12 @@ public class Transcriber {
         return new FileResponse(textMessage, reply);
         // Handle it. <fileresponse reply="" ></fileresponse>
     }
-    
-    /**
-     * Turns HTML names into symbols
-     * @param String input, received message with HTML names 
-     * @return String, message to be displayed
-     */
-    private static String decodeHTML(String input) {
-        input.replaceAll("&quot", "\"");
-        input.replaceAll("&amp", "&");
-        input.replaceAll("&lt", "<");
-        input.replaceAll("&gt", ">");
-        return input;
-    }
-    
-    /**
-     * Turns symbols into HTML names in a message to be sent
-     * @param String input, message written in GUI
-     * @return String, message to be sent with HTML names
-     */
-    public static String encodeHTML(String input) {
-        input.replaceAll("\"", "&quot");
-        input.replaceAll("&", "&amp");
-        input.replaceAll("<", "&lt");
-        input.replaceAll(">", "&gt");
-        return input;
-    }
 
+    /**
+     * Converts a Document to human readable string (one line XML).
+     * @param doc The document to be interpreted.
+     * @return A string representation of the XML document.
+     */
     private static String getXML(Document doc) {
         try {
             DOMSource domSource = new DOMSource(doc);
