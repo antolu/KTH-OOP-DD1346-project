@@ -12,6 +12,9 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Component;
 
+/**
+ * The menu bar in the chat client.
+ */
 public class MenuBar extends JPanel {
     private JButton changeNameButton;
     private JButton disconnectButton;
@@ -19,16 +22,24 @@ public class MenuBar extends JPanel {
 
     private Backend backend;
 
+    /**
+     * Constructor.
+     * @param backend The backend. Used to process all button presses.
+     */
     public MenuBar(Backend backend) {
         super(new FlowLayout());
 
         this.backend = backend;
 
         createGUI();
-        addActionListeners(backend);
+        addActionListeners();
     }
 
+    /**
+     * Creates the GUi
+     */
     private void createGUI() {
+        /* Creates some buttons for format them */
         changeNameButton = new JButton();
         disconnectButton = new JButton();
         newConnectionButton = new JButton();
@@ -43,6 +54,7 @@ public class MenuBar extends JPanel {
 
         disconnectButton.setEnabled(false); // Nothing to disconnect
 
+        /* Set the layout of the menubar */
         setLayout(new FlowLayout(FlowLayout.LEFT));
 
         setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
@@ -52,7 +64,11 @@ public class MenuBar extends JPanel {
         add(disconnectButton, BorderLayout.WEST);
     }
 
-    private void addActionListeners(Backend backend) {
+    /**
+     * Creates action listeners for every button and
+     * multithreads a popup window for each.
+     */
+    private void addActionListeners() {
         changeNameButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -75,6 +91,7 @@ public class MenuBar extends JPanel {
 
         disconnectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                /* Show confirmation before closing all open connections */
                 int confirm = JOptionPane.showOptionDialog(
                     null, "Are You Sure to disconnect all sockets?", 
                     "Exit Confirmation", JOptionPane.YES_NO_OPTION, 
@@ -86,10 +103,14 @@ public class MenuBar extends JPanel {
         });
     }
 
+    /**
+     * Enables disconnect button (if there actually exist connections that can be disconnected)
+     */
     public void enableDisconnectButton() {
         disconnectButton.setEnabled(true);
     }
 
+    /** Disables the disconnect butotn */
     public void disableDisconnectButton() {
         disconnectButton.setEnabled(false);
     }

@@ -24,8 +24,8 @@ public class SocketClient implements Runnable {
 	
 	/**
 	 * Constructor that gets a "pointer" to the backend, and the socket that was initialized in the backend
-	 * @param socket, through all communication with the client is happening
-	 * @param backend, to be able to "talk" with the backend
+	 * @param socket through all communication with the client is happening
+	 * @param backend to be able to "talk" with the backend
 	 */
 	public SocketClient(Socket socket, Backend backend) {
         clientSocket = socket;
@@ -38,16 +38,10 @@ public class SocketClient implements Runnable {
             // Process the exception
         }
 	}
-	
+
 	/**
-	 * 
-	 */
-	public void notifyObservers(Object obj) {
-		
-	}
-	
-	/**
-	 * Where the socket receives messages and sends them to the parser and to notify observers
+	 * Receives messages from the sockets.
+     * @return Returns te received string
 	 */
 	private String receive() {
         StringBuilder string = new StringBuilder();
@@ -76,13 +70,20 @@ public class SocketClient implements Runnable {
         out.flush();
     }
     
+    /**
+     * Gets the ID of the socket (remote IP adress).
+     * @return The IP adress of the other end of the socket.
+     */
     public String getSocketID() {
         return ((InetSocketAddress) clientSocket.getRemoteSocketAddress()).getAddress().toString();
     }
 
+    /**
+     * Closes the socket.
+     */
     public void close() {
         try {
-        clientSocket.close();
+            clientSocket.close();
         } catch (IOException e) {
             System.err.println("Unable to close socket");
             // Do nothing
@@ -96,23 +97,34 @@ public class SocketClient implements Runnable {
         return ((SocketClient) obj).getSocketID().equals(clientSocket.getRemoteSocketAddress().toString());
     }
 
+    /**
+     * Implements Runnable. Continually listens for incoming messages
+     * in the socket. Parses messages and returns them to backend.
+     */
     public void run() {
         String message;
         Query parsedMessage;
+
         while (!clientSocket.isClosed()) {
             message = receive();
             System.err.println("Received message " + message);
-            if (message.equals(""))
+
+            /* Do not parse empty messages */
+            if (message.equals("") || message == null)
                 continue;
 
+            /* Parse the message */
             parsedMessage = Transcriber.parse(message, this);
 
+            /* Forward message to the backend */
             backend.receiveMessage(parsedMessage, this);
         }
     }
 
+    /**
+     * Starts a multithreaded listener
+     */
     public void start () {
-        // System.out.println("Starting " +  threadName );
         if (t == null) {
            t = new Thread(this);
            t.start();

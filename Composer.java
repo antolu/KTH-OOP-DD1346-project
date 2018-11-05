@@ -1,7 +1,16 @@
 import java.lang.StringBuilder;
 import java.lang.String;
 
+/**
+ * Convenience class with static methods to compose all required messages
+ */
 public class Composer {
+    /**
+     * Composes a connection request.
+     * @param message A message.
+     * @param name The name of the user sending the request.
+     * @return The composed message.
+     */
     public static String composeRequest(String message, String name) {
         StringBuilder sb = new StringBuilder();
         sb.append("<request");
@@ -17,6 +26,12 @@ public class Composer {
         return sb.toString();
     }
 
+    /**
+     * Composes the reply to a connection request
+     * @param name The name of the user sending the reply.
+     * @param reply The reply (yes/no)
+     * @return The composed message.
+     */
     public static String composeRequestReply(String name, String reply) {
         StringBuilder sb = new StringBuilder();
         sb.append("<request");
@@ -33,6 +48,15 @@ public class Composer {
         return sb.toString();
     }
 
+    /**
+     * Composes a text message.
+     * @param message The message.
+     * @param color The color of the message. 
+     * @param encryptionType The encryption type of the message (if applicable).
+     * @param encryptionKey The encryption key of the message (if applicable).
+     * @param name The name of the user sending the message.
+     * @return The composed message.
+     */
     public static String composeMessage(String message, String color, String encryptionType, String encryptionKey, String name) {
         StringBuilder sb = new StringBuilder();
         /* <message> */
@@ -73,6 +97,17 @@ public class Composer {
         return sb.toString();
     }
 
+    /**
+     * Composes a text message with an extra multipart flag.
+     * @param message The message.
+     * @param color The color of the message. 
+     * @param encryptionType The encryption type of the message (if applicable).
+     * @param encryptionKey The encryption key of the message (if applicable).
+     * @param name The name of the user sending the message.
+     * @param serverclient Whether the sender is a server or a client in the 
+     * multipart conversation.
+     * @return The composed message.
+     */
     public static String composeMultiPartMessage(String message, String color, String encryptionType, String encryptionKey, String name, String serverclient) {
         StringBuilder sb = new StringBuilder();
         /* <message> */
@@ -116,6 +151,16 @@ public class Composer {
         return sb.toString();
     }
 
+    /**
+     * Composes a file request.
+     * @param message A message.
+     * @param filename The name of the file.
+     * @param filesize The size of the file.
+     * @param port The port where the connection should be made to.
+     * @param encryptionType The type of the encryption, if the file is to be encrypted.
+     * @param encryptionKey The key of the encryption, if the file is to be encrypted.
+     * @return The composed message.
+     */
     public static String composeFileRequest(String message, String filename, String filesize, String port, String encryptionType, String encryptionKey) {
         StringBuilder sb = new StringBuilder();
 
@@ -153,6 +198,12 @@ public class Composer {
         return sb.toString();
     }
 
+    /**
+     * Composes the response to a file request.
+     * @param message A message.
+     * @param reply The reply (yes/no)
+     * @return The composed message.
+     */
     public static String composeFileResponse(String message, String reply) {
         StringBuilder sb = new StringBuilder();
         sb.append("<message>");
@@ -170,6 +221,12 @@ public class Composer {
         return sb.toString();
     }
 
+    /**
+     * Composes a key request message.
+     * @param message A message.
+     * @param type The type of encryption the key is wished for.
+     * @return The composed message.
+     */
     public static String composeKeyRequest(String message, String type) {
         StringBuilder sb = new StringBuilder();
         sb.append("<message>");
@@ -187,6 +244,11 @@ public class Composer {
         return sb.toString();
     }
 
+    /**
+     * Composes the response to a key request.
+     * @param key The key to the response.
+     * @return The composed message.
+     */
     public static String composeKeyRequestResponse(String key) {
         StringBuilder sb = new StringBuilder();
         sb.append("<message>");
