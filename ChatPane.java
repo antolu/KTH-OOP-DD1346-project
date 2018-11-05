@@ -308,16 +308,12 @@ public class ChatPane extends JPanel {
     }
 
     private void disconnect() {
-        users.get(0).getClientSocket().send(Composer.getDisconnectMessage());
         chatWindow.addMessage(new Message("You disconnected.", "000000", "", ""));
         disconnectExternal();
     }
 
     public void disconnectExternal() {
         disable();
-
-        
-        users.get(0).getClientSocket().close();
 
         backend.disconnect(users.get(0));
     }

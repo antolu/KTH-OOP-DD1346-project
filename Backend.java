@@ -331,9 +331,10 @@ public class Backend {
     }
     
     public void disconnectAll() {
-        for (User user : userList)
+        for (int i = 0; i < userList.size(); i++)
         {
-            chatMap.get(user).disconnectExternal();
+            chatMap.get(userList.get(i)).addMessage(new Message("You disconnected."));
+            chatMap.get(userList.get(i)).disconnectExternal();
         }
     }
 
@@ -348,6 +349,9 @@ public class Backend {
         userList.remove(user);
         userListServer.remove(user);
         connectedUsersCount--;
+
+        user.getClientSocket().send(Composer.getDisconnectMessage());
+        user.getClientSocket().close();
 
         if (userListServer.size() <= 0)
             connectedUsersCount = 0;
