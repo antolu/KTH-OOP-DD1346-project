@@ -204,7 +204,7 @@ public class Backend {
      * request. 
      */
     private void showConnectionRequest(Request request, User user) {
-        if (connectedUsersCount >= MAX_CONNECTIONS) {
+        if (userList.size() >= MAX_CONNECTIONS) {
             user.getClientSocket().send(Composer.composeRequestReply(myName, "no"));
             JOptionPane.showMessageDialog(frame, "An user from " + user.getClientSocket().getSocketID() + " has tried to connect to you, but the max supported number of connections has been reached.");
             user.getClientSocket().close();
