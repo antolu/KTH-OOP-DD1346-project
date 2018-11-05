@@ -71,6 +71,7 @@ public class SocketClient implements Runnable {
 	 * @param msg, the message to be sent 
 	 */
 	public void send(String msg) {
+        msg.replaceAll("\n", ""); // Remove all line breaks
         out.println(msg);
         out.flush();
     }
