@@ -118,7 +118,7 @@ public class ChatPane extends JPanel {
     }
 
     private void createGUI() {
-        chatWindow = new ChatWindow(user);
+        chatWindow = new ChatWindow(users.get(0));
         scrollPane = new JScrollPane(chatWindow);
         msgField = new JTextField();
 
