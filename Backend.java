@@ -130,24 +130,24 @@ public class Backend {
      * @param query The new message.
      */
     public void receiveMessage(Query query, SocketClient socket) {
+        User user = userMap.get(socket.getSocketID());
+        
         if (query instanceof Message) {
             Message msg = (Message) query;
             
             if (msg.getMultipartMode().equals("server")) {
-                User user = userMap.get(socket.getSocketID());
                 
                 multipartMap.get(user).addMessage(msg);
             }
             else if (msg.getMultipartMode().equals("client")) {
                 if (multiPartPane != null) {
-                    for (User user : userListServer) {
-                        user.getClientSocket().send(msg.getOriginalMessage());
+                    for (User usr : userListServer) {
+                        usr.getClientSocket().send(msg.getOriginalMessage());
                     }
                     multiPartPane.addMessage(msg);
                 }
             }
 
-            User user = userMap.get(socket.getSocketID());
             ChatPane chatPane = chatMap.get(user);
             chatPane.addMessage(msg);
         }
@@ -160,7 +160,6 @@ public class Backend {
             RequestResponse response = (RequestResponse) query;
             if (response.getReply().equals("yes")) {
                 addConnectionAsClient(response.getName(), socket);
-                // add socket
             }
             else {
                 socket.close();
@@ -174,9 +173,15 @@ public class Backend {
 
         }
         else if (query instanceof KeyRequest) {
+            KeyRequest keyrequest = (KeyRequest) query;
+            ChatPane chatPane = chatMap.get(user);
+
+            String key = chatPane.getPublicKey(keyrequest.getType());
+            if (key == null)
+                return; // No suuuport for the key type
+            user.getClientSocket().send(Composer.composeKeyRequestResponse(key));
         }
         else if (query.getMessage().equals("<disconnect />")) {
-            User user = userMap.get(socket.getSocketID());
             ChatPane chatPane = chatMap.get(user);
             chatPane.addMessage(new Message(user + " disconnected.", "000000", "", ""));
             chatPane.disconnectExternal();
