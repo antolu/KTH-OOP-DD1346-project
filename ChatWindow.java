@@ -93,6 +93,7 @@ public class ChatWindow extends JEditorPane {
 
         setEditorKit(new HTMLEditorKit());
         setText(HTML);
+        setEditable(false);
         } catch (Exception e) {
             e.printStackTrace();
         }
