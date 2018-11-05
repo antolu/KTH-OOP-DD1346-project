@@ -6,6 +6,9 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import java.awt.Component;
 
 import java.awt.BorderLayout;
@@ -31,7 +34,7 @@ public class ChatPane extends JPanel {
     private JScrollPane scrollPane;
     private ChatWindow chatWindow;
     /** The textfield where you type your messages */
-    private JEditorPane msgField;
+    private JTextField msgField;
     /** Press here to send */
     private JButton sendButton;
     /** Press here to send a file */
@@ -112,7 +115,7 @@ public class ChatPane extends JPanel {
     private void createGUI() {
         chatWindow = new ChatWindow(user);
         scrollPane = new JScrollPane(chatWindow);
-        msgField = new JEditorPane();
+        msgField = new JTextField();
 
         JScrollBar vertical = scrollPane.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());
@@ -190,42 +193,13 @@ public class ChatPane extends JPanel {
     private void addActionListeners(ChatPane pane) {
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String message = msgField.getText();
-                msgField.setText("");
-                Message msg = new Message(message, currentColor, dtf.format(LocalDateTime.now()), "Me");
-                chatWindow.sentMessage(msg);
+                sendMessage();
+            }
+        });
 
-
-                // Actually send the message to the socket(s)
-                if (isMultipartServer) {
-                    if (encryptButton.getState()) {
-                        message = Composer.composeMultiPartMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName(), "server");
-                    }
-                    else {
-                        message = Composer.composeMultiPartMessage(message, currentColor, "", "", backend.getMyName(), "server");
-                    }
-                }
-                else if(isMultipartClient) {
-                    if (encryptButton.getState()) {
-                        message = Composer.composeMultiPartMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName(), "client");
-                    }
-                    else {
-                        message = Composer.composeMultiPartMessage(message, currentColor, "", "", backend.getMyName(), "client");
-                    }
-                }
-                else {
-                    if (encryptButton.getState()) {
-                        
-                        message = Composer.composeMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName());
-                    }
-                    else {
-                        message = Composer.composeMessage(message, currentColor, "", "", backend.getMyName());
-                    }
-                }
-
-                for (User user : users) {
-                    user.getClientSocket().send(message);
-                }
+        msgField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(); 
             }
         });
 
@@ -290,6 +264,45 @@ public class ChatPane extends JPanel {
                 // Disconnect using backend or inform backend. SHOW CONFIRMATION!!!
             }
         });
+    }
+
+    private void sendMessage() {
+        String message = msgField.getText();
+        msgField.setText("");
+        Message msg = new Message(message, currentColor, dtf.format(LocalDateTime.now()), "Me");
+        chatWindow.sentMessage(msg);
+
+
+        // Actually send the message to the socket(s)
+        if (isMultipartServer) {
+            if (encryptButton.getState()) {
+                message = Composer.composeMultiPartMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName(), "server");
+            }
+            else {
+                message = Composer.composeMultiPartMessage(message, currentColor, "", "", backend.getMyName(), "server");
+            }
+        }
+        else if(isMultipartClient) {
+            if (encryptButton.getState()) {
+                message = Composer.composeMultiPartMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName(), "client");
+            }
+            else {
+                message = Composer.composeMultiPartMessage(message, currentColor, "", "", backend.getMyName(), "client");
+            }
+        }
+        else {
+            if (encryptButton.getState()) {
+                
+                message = Composer.composeMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName());
+            }
+            else {
+                message = Composer.composeMessage(message, currentColor, "", "", backend.getMyName());
+            }
+        }
+
+        for (User user : users) {
+            user.getClientSocket().send(message);
+        }
     }
 
     public void addUser(User user) {
