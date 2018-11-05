@@ -1,10 +1,11 @@
 import javax.swing.JPanel;
-
+import javax.swing.JScrollBar;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import java.awt.Component;
 
 import java.awt.BorderLayout;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 public class ChatPane extends JPanel {
     private Backend backend;
     /** The window that displays all the messages */
+    private JScrollPane scrollPane;
     private ChatWindow chatWindow;
     /** The textfield where you type your messages */
     private JEditorPane msgField;
@@ -109,9 +111,13 @@ public class ChatPane extends JPanel {
 
     private void createGUI() {
         chatWindow = new ChatWindow(user);
+        scrollPane = new JScrollPane(chatWindow);
         msgField = new JEditorPane();
 
-        /* Create and format buttonss */
+        JScrollBar vertical = scrollPane.getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
+
+        /* Create and format buttons */
         sendFileButton = new JButton();
         setEncryptionButton = new JButton();
         setColorButton = new JButton();
@@ -167,7 +173,7 @@ public class ChatPane extends JPanel {
         msgFieldPanel.add(msgField, BorderLayout.WEST);
         msgFieldPanel.add(sendButtonPanel, BorderLayout.EAST);
 
-        leftPanel.add(chatWindow, BorderLayout.NORTH);
+        leftPanel.add(scrollPane, BorderLayout.NORTH);
         leftPanel.add(msgFieldPanel, BorderLayout.SOUTH);
 
         rightPanel.add(sendFileButton);
