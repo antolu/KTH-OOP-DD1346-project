@@ -89,7 +89,7 @@ public class Transcriber {
      * @return Message, the received message parsed
      */
     public static Query parse(String msg, SocketClient socket) {
-        msg = unescapeHtml4(msg);
+        // msg = unescapeHtml4(msg);
         msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + msg;
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
 
