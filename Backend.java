@@ -167,10 +167,20 @@ public class Backend {
             }
         }
         else if (query instanceof FileRequest) {
-            
+            FileRequest fileRequest = (FileRequest) query;
+            ChatPane chatPane = chatMap.get(user);
+            FileHandler fileHandler = chatPane.getFileHandler();
+            fileHandler.ShowFileRequest(fileRequest);
         }
         else if (query instanceof FileResponse) {
-
+            FileResponse fileResponse = (FileResponse) query;
+            ChatPane chatPane = chatMap.get(user);
+            FileHandler fileHandler = chatPane.getFileHandler();
+            try {
+                fileHandler.handleResponse(fileResponse);
+            }catch(InterruptedException e1){
+                //do something
+            }
         }
         else if (query instanceof KeyRequest) {
             KeyRequest keyrequest = (KeyRequest) query;
@@ -218,16 +228,6 @@ public class Backend {
         });
     }
 
-    /**
-     * Called when a new file transfer request is received. 
-     * Displays a new window prompting a yes / no answer and a 
-     * custom message response (unformatted), and the request message
-     * from the other user.
-     * @param requestMessage The message encapsulated in the file request.
-     */
-    private void showFileRequest(String requestMessage) {
-
-    }
 
     private void newClientMultipartConnection(SocketClient socket) {
         User user = userMap.get(socket.getSocketID());

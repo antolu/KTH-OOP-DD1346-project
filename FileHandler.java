@@ -13,19 +13,20 @@ public class FileHandler{
     /**
      * if a file-progress already is taking place
      */
-    public static volatile boolean isRunning;
-    public volatile boolean requestAnswered;
-    public ServerSocket server=null;
-    public static Socket client = null;
-    public File file=null;
-    public static User user = null;
-    public String encr = "";
-    public String key = "";
+    private static volatile boolean isRunning=false;
+    private volatile boolean requestAnswered=false;
+    private ServerSocket server=null;
+    private static Socket client = null;
+    private File file=null;
+    private static User user = null;
+    private String encr = "";
+    private String key = "";
     private PrintWriter out = null;
 
-    public FileHandler() {
-        isRunning = true;
-        requestAnswered = false;
+    public FileHandler(User inUser) {
+        this.isRunning = false;
+        this.requestAnswered = false;
+        this.user = inUser;
     }
 
     /**
@@ -51,7 +52,9 @@ public class FileHandler{
      * @param filerequest, containing optional accompanning message, file size and file name
      * @param socket, from  which socket the message came from
      */
-    public static void ShowFileRequest(FileRequest filerequest, User inUser) {
+    public static void ShowFileRequest(FileRequest filerequest) {
+
+        isRunning = true;
 
         String host = filerequest.getIP();
 
@@ -60,7 +63,6 @@ public class FileHandler{
         }catch(IOException e) {
             //do something
         }
-        user = inUser;
 
         JFrame fileRequest = new JFrame("File Request");
         fileRequest.setSize(400,300);
@@ -115,7 +117,7 @@ public class FileHandler{
 
                     JFrame progressFrame = new JFrame();
                     JProgressBar progressBar = new JProgressBar();
-                    JLabel progressLabel = new JLabel("Current kb of file to download from user "+inUser.getName());
+                    JLabel progressLabel = new JLabel("Current kb of file to download from user "+user.getName());
 
                     progressBar.setMinimum(0);
                     progressBar.setMaximum(100);
@@ -168,6 +170,8 @@ public class FileHandler{
                 }catch(IOException e1) {
                     //do something
                 }
+
+                isRunning = false;
             }
         });
 
@@ -191,9 +195,9 @@ public class FileHandler{
      * @param key, the key corresponding to the encryption
      * @param user, the object/person which the file is to be sent to
      */
-    public void sendFileRequest(ServerSocket inServer, SocketClient messageSocket, String message, int port, File inFile, String inEncr, String inKey, User inUser) {
+    public void sendFileRequest(ServerSocket inServer, SocketClient messageSocket, String message,
+                                int port, File inFile, String inEncr, String inKey) {
 
-        user = inUser;
         String username = user.getName();
         encr = inEncr;
         key = inKey;
@@ -210,7 +214,7 @@ public class FileHandler{
                 while(true){
 
                     if(countDown<=0){
-                        displayQueryError(user);
+                        displayQueryError();
                         isRunning = false;
                         try {
                             server.close();
@@ -242,7 +246,6 @@ public class FileHandler{
         messageSocket.send(requestMessage);
 
         t.start();
-
     }
 
     /**
@@ -250,7 +253,7 @@ public class FileHandler{
      *
      * @param user, the user that the file request was initially sent to
      */
-    private void displayQueryError(User user) {
+    private void displayQueryError() {
 
         JFrame requestResponse=new JFrame("Warning");
 
@@ -283,14 +286,18 @@ public class FileHandler{
      *
      * @param response,
      */
-    public void handleResponse(String response) throws InterruptedException {
+    public void handleResponse(FileResponse fileResponse) throws InterruptedException {
 
 
         requestAnswered = true;
         Socket clientSocket=null;
+
+        String reply = fileResponse.getReply();
+        String responseMessage = fileResponse.getMessage();
+
         //
         //all the things used as file,socket etc needs to be saved somewhere before
-        if(response=="yes") {
+        if(reply=="yes") {
 
             try{
                 clientSocket = server.accept();
@@ -343,7 +350,6 @@ public class FileHandler{
                     progressBar.setValue((int)percentageSent);
                     progressFrame.repaint();
 
-                    //System.out.println(count);
                     out.write(bytes, 0, count);
                     try{
                         Thread.sleep(50);
@@ -380,7 +386,7 @@ public class FileHandler{
             JButton respondButton=new JButton("OK");
             respondButton.setBounds(50,100,95,30);
 
-            JLabel myLabel = new JLabel("Your message request was denied");
+            JLabel myLabel = new JLabel("Your message request was denied, with message: "+responseMessage);
             myLabel.setSize(250,50);
 
             requestResponse.add(respondButton);
