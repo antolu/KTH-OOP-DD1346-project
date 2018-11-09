@@ -181,7 +181,7 @@ public class Composer {
         sb.append("\"");
 
         sb.append(" port=\"");
-        sb.append(filesize);
+        sb.append(port);
         sb.append("\"");
 
         if (!encryptionType.equals("")) {

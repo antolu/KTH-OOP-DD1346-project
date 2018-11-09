@@ -54,6 +54,7 @@ public class FileChooser{
 
                         try{
                             fileSocket = new ServerSocket(portNumber);
+                            System.out.println(portNumber);
                             foundPort = true;
                         }catch(IOException e1) {
                             System.out.println("Failed to bind to port");

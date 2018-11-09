@@ -15,8 +15,13 @@ public class FileRequest extends Query {
      * @param fileName The name of the file to be transferred.
      * @param fileSize The size of the file to be transferred.
      */
-    public FileRequest(String message, String fileName, String fileSize, String IP, String port, String encryptionType, String encryptionKey) {
+    public FileRequest(String message, String fileName, String fileSize, String IP,
+                       String port, String encryptionType, String encryptionKey) {
         super(message);
+
+        System.out.println("THIS IS IN FILEREQUEST");
+        System.out.println(fileName);
+        System.out.println(fileSize);
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.IP = IP;

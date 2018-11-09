@@ -90,13 +90,13 @@ public class ChatPane extends JPanel {
         this.user = user;
         this.clientSocket = user.getClientSocket();
         this.isMultipartClient = isMultipartClient;
-        this.fileHandler = new FileHandler(users.get(0));
+
 
         users = new ArrayList<>();
         sockets = new ArrayList<>();
         users.add(user);
         sockets.add(clientSocket);
-
+        this.fileHandler = new FileHandler(users.get(0));
         encryptionKeys = new HashMap<>();
 
         createGUI();
