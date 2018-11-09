@@ -89,7 +89,7 @@ public class Transcriber {
      * @return Message, the received message parsed
      */
     public static Query parse(String msg, SocketClient socket) {
-        msg = unescapeHtml4(msg);
+        // msg = unescapeHtml4(msg);
         msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + msg;
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
 
@@ -107,7 +107,7 @@ public class Transcriber {
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("disconnect"))
                     return new Query("<disconnect />");
                 else if (message.getAttribute("multipart").equals("start"))
-                    return new Query("<multipart start />");
+                    return new Query("<multipartstart />");
                 return parseMessage(doc, message);
             }
             else if (message.getTagName() == "request") {

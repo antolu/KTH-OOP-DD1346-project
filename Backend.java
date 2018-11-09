@@ -207,7 +207,7 @@ public class Backend {
                 multiPartPane.removeUser(user);
             }
         }
-        else if (query.getMessage().equals("<multipart start />")) {
+        else if (query.getMessage().equals("<multipartstart />")) {
             newClientMultipartConnection(socket);
         }
     }
