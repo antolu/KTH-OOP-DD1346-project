@@ -57,9 +57,10 @@ public class FileHandler{
         isRunning = true;
 
         String host = filerequest.getIP();
+        int port = Integer.parseInt(filerequest.getPort());
 
         try {
-            client = new Socket(host, Integer.parseInt(filerequest.getPort()));
+            client = new Socket(host, port);
         }catch(IOException e) {
             //do something
         }
@@ -130,10 +131,7 @@ public class FileHandler{
 
                     while ((count = in.read(bytes)) > 0) {
 
-                        System.out.println(count);
                         totalReceived = totalReceived+count;
-                        System.out.println(totalReceived+" "+percentageReceived);
-                        System.out.println(totalReceived/fileSize);
                         percentageReceived = totalReceived/fileSize*100.0;
                         progressBar.setValue((int)percentageReceived);
                         progressFrame.repaint();
@@ -344,8 +342,6 @@ public class FileHandler{
                 while ((count = in.read(bytes)) > 0) {
 
                     totalSent = totalSent+count;
-                    System.out.println(totalSent+" "+percentageSent);
-                    System.out.println(totalSent/length);
                     percentageSent = totalSent/length*100.0;
                     progressBar.setValue((int)percentageSent);
                     progressFrame.repaint();
