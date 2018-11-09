@@ -170,7 +170,13 @@ public class Backend {
             FileRequest fileRequest = (FileRequest) query;
             ChatPane chatPane = chatMap.get(user);
             FileHandler fileHandler = chatPane.getFileHandler();
-            fileHandler.ShowFileRequest(fileRequest);
+
+            if(!fileHandler.getRunningStatus()) {
+                fileHandler.ShowFileRequest(fileRequest);
+            }
+            else{
+                //skicka tillbaka error-meddelande
+            }
         }
         else if (query instanceof FileResponse) {
             FileResponse fileResponse = (FileResponse) query;
