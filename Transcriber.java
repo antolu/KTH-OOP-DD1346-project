@@ -100,7 +100,9 @@ public class Transcriber {
 
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
-                if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
+                if (message.getAttribute("multipart").equals("start"))
+                    return new Query("<multipartstart />");
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
                     return parseFileRequest((Element) message.getChildNodes().item(0), socket);
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
                     return parseFileResponse((Element) message.getChildNodes().item(0));
@@ -267,7 +269,7 @@ public class Transcriber {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
             transformer.transform(domSource, result);
-            return writer.toString();
+            return writer.toString().replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
         }
         catch (Exception e) {
             e.printStackTrace();

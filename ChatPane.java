@@ -40,31 +40,21 @@ import java.time.LocalDateTime;
  */
 public class ChatPane extends JPanel {
     private Backend backend;
-    /** The window that displays all the messages */
     private JScrollPane scrollPane;
     private ChatWindow chatWindow;
-    /** The textfield where you type your messages */
     private JTextField msgField;
-    /** Press here to send */
+
+    /** All relevant buttons for the GUI*/
     private JButton sendButton;
-    /** Press here to send a file */
     private JButton sendFileButton;
-    /** Press here to set global encryption. */
     private JButton setEncryptionButton;
-    /** Press here to open up a color selector */
     private JButton setColorButton;
     private JButton disconnectButton;
     private ToggleableButton encryptButton;
     private JButton closeButton;
 
-    /** The user messages are sent to */
-    private User user;
-    /** The socket messages are sent to */
-    private SocketClient clientSocket;
-
     /** Placeholder for multipart chats */
     private List<User> users;
-    private List<SocketClient> sockets;
 
     /** The current color all msesages are sent with */
     private volatile String currentColor = "000000";
@@ -87,21 +77,23 @@ public class ChatPane extends JPanel {
      */
     public ChatPane(Backend backend, User user , Boolean isMultipartClient) {
         this.backend = backend;
-        this.user = user;
-        this.clientSocket = user.getClientSocket();
         this.isMultipartClient = isMultipartClient;
 
 
         users = new ArrayList<>();
-        sockets = new ArrayList<>();
         users.add(user);
-        sockets.add(clientSocket);
         this.fileHandler = new FileHandler(users.get(0));
         encryptionKeys = new HashMap<>();
 
         createGUI();
-        addActionListeners(this);
+        addActionListeners();
 
+        /* Disables certain buttons, prevents mistakes */
+        if (isMultipartClient) {
+            disconnectButton.setEnabled(false);
+            closeButton.setEnabled(false);
+            sendFileButton.setEnabled(false);
+        }
     }
 
     /**
@@ -111,28 +103,30 @@ public class ChatPane extends JPanel {
      */
     public ChatPane(Backend backend, List<User> users) {
         this.backend = backend;
-        this.users = users;
 
         isMultipartServer = true;
 
-        users = new ArrayList<>();
-        sockets = new ArrayList<>();
         encryptionKeys = new HashMap<>();
 
         createGUI();
-        addActionListeners(this);
+        addActionListeners();
+
+        /* Disables certain buttons, prevents mistakes */
         disconnectButton.setEnabled(false);
         closeButton.setEnabled(false);
         sendFileButton.setEnabled(false);
 
         /* Start multipart on all clients also */
         for (User user : users) {
-            user.getClientSocket().send("<message><multipartstart></message>");
+            user.getClientSocket().send(Composer.MULTIPART_START);
         }
     }
 
+    /**
+     * Creates the chat window, and all the relevant buttons.
+     */
     private void createGUI() {
-        chatWindow = new ChatWindow(users.get(0));
+        chatWindow = new ChatWindow(users.get(0).getName());
         scrollPane = new JScrollPane(chatWindow);
         msgField = new JTextField();
 
@@ -209,21 +203,35 @@ public class ChatPane extends JPanel {
         this.setPreferredSize(new Dimension(780, 470));
     }
 
-    private void addActionListeners(ChatPane pane) {
+    /**
+     * Adds actionlisteners to all the buttons and the message field.
+     */
+    private void addActionListeners() {
+        final ChatPane pane = this;
+
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                sendMessage();
+                /* Retrieve message from text field and send it if is not empty */
+                String msg = msgField.getText();
+                if (msg.equals("")) return;
+                sendMessage(msg); 
+                msgField.setText("");
             }
         });
 
         msgField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                sendMessage(); 
+                /* Retrieve message from text field and send it if is not empty */
+                String msg = msgField.getText();
+                if (msg.equals("")) return;
+                sendMessage(msg); 
+                msgField.setText("");
             }
         });
 
         setColorButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                /* Creates a color chooser on a new thread */
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         new ColorChooser(pane);
@@ -234,6 +242,7 @@ public class ChatPane extends JPanel {
 
         setEncryptionButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                /* Creates an encryption chooser on a new thread */
                 javax.swing.SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         new EncryptionChooser(pane);
@@ -244,6 +253,8 @@ public class ChatPane extends JPanel {
 
         encryptButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                /* Checks if there is an encryption selected, and toggles 
+                the button if so */
                 if (currentEncryptionType.equals("")) {
                     JOptionPane.showMessageDialog(pane, "No encryption has been selected. Please select an encryption first.");
                     return;
@@ -271,6 +282,7 @@ public class ChatPane extends JPanel {
 
         disconnectButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                /* Show confirmation dialog, disconnect if true */
                 int confirm = JOptionPane.showOptionDialog(
                     null, "Are You Sure to disconnect?", 
                     "Disconnect Confirmation", JOptionPane.YES_NO_OPTION, 
@@ -278,12 +290,12 @@ public class ChatPane extends JPanel {
                 if (confirm == 0) {
                     disconnect();
                 }
-                // Disconnect using backend or inform backend. SHOW CONFIRMATION!!!
             }
         });
 
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                /* Show confirmation dialog, close pane if true */
                 int confirm = JOptionPane.showOptionDialog(
                     null, "Are you sure you want to close this window? \n This will close the connection if it is still open.", 
                     "Disconnect Confirmation", JOptionPane.YES_NO_OPTION, 
@@ -291,19 +303,22 @@ public class ChatPane extends JPanel {
                 if (confirm == 0) {
                     close();
                 }
-                // Disconnect using backend or inform backend. SHOW CONFIRMATION!!!
             }
         });
     }
 
-    private void sendMessage() {
-        String message = msgField.getText();
-        msgField.setText("");
+    /**
+     * Sends the a message to all users existing in this chatpane
+     * @param message The message to be sent.
+     */
+    private void sendMessage(String message) {
+  
+        /* Display the message to the senders feed */
         Message msg = new Message(message, currentColor, dtf.format(LocalDateTime.now()), "Me");
         chatWindow.sentMessage(msg);
 
-
         // Actually send the message to the socket(s)
+        /* Format the message accordingly if is a multipart message */
         if (isMultipartServer) {
             if (encryptButton.getState()) {
                 message = Composer.composeMultiPartMessage(message, currentColor, currentEncryptionType, encryptionKeys.get(currentEncryptionType), backend.getMyName(), "server");
@@ -330,44 +345,74 @@ public class ChatPane extends JPanel {
             }
         }
 
+        /* Send composed message to all users */
         for (User user : users) {
             user.getClientSocket().send(message);
         }
     }
 
+    /**
+     * Gets the file handler
+     * @return The File handler
+     */
     public FileHandler getFileHandler() {
         return fileHandler;
     }
 
+    /**
+     * Adds a user to a multipart chat
+     * @param user The user to be added
+     */
     public void addUser(User user) {
-        user.getClientSocket().send("<message><multipartstart></message>");
-        addMessage(new Message(user + "connected."));
+        /* Tell the user to start a client multipart chat */
+        user.getClientSocket().send(Composer.MULTIPART_START);
+
+        /* Inform "me" that a new user has been added */
+        addMessage(new Message(user + " connected."));
+
+        /* Actually add the user */
         users.add(user);
     }
     
+    /**
+     * Removes a user from a multipart chat
+     * @param user The user to be removed
+     */
     public void removeUser(User user) {
         users.remove(user);
+        /* Tell "me" that a user has disconnected */
+        sendMessage(user + " disconnected.");
     }
 
+    /**
+     * Close this chat pane
+     */
     private void close() {
-        if (sendButton.isEnabled()) 
+        /* Disconnect automatically if not a multipart chat */
+        if (!isMultipartClient && sendButton.isEnabled()) 
             disconnect();
 
+        /* Remove the pane from the GUI using backend */
         backend.close(this, users.get(0));
     }
 
+    /**
+     * Disconnect the connection represented in the current chat pane
+     */
     private void disconnect() {
+        /* Tell "me" that I have disconnected */
         chatWindow.addMessage(new Message("You disconnected.", "000000", "", ""));
-        disconnectExternal();
-    }
 
-    public void disconnectExternal() {
+        /* Disable the chat pane GUI (buttons) */
         disable();
 
+        /* Use backend to disconnect the user */
         backend.disconnect(users.get(0));
     }
 
-    @Override
+    /**
+     * Disables the GUI: isables buttons.
+     */
     public void disable() {
         sendButton.setEnabled(false);
         sendFileButton.setEnabled(false);
@@ -376,7 +421,6 @@ public class ChatPane extends JPanel {
         disconnectButton.setEnabled(false);
         setColorButton.setEnabled(false);
         msgField.setEditable(false);
-
     }
 
     /**
@@ -388,10 +432,19 @@ public class ChatPane extends JPanel {
         return encryptionKeys.get(type);
     }
 
+    /**
+     * Updates the color used to send messages
+     * @param color The new color
+     */
     public void updateColor(String color) {
         currentColor = color;
     }
 
+    /**
+     * Updates the encryption used to send messages
+     * @param type The new encryption type
+     * @param key The new encryption key
+     */
     public void updateEncryption(String type, String key) {
         this.currentEncryptionType = type;
         encryptionKeys.put(type, key);
