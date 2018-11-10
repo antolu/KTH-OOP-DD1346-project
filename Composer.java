@@ -6,6 +6,9 @@ import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
  * Convenience class with static methods to compose all required messages
  */
 public class Composer {
+    public static final String DISCONNECT_MESSAGE = "<message><disconnect /></message>";
+    public static final String MULTIPART_START = "<message multipart=\"start\"></message>";
+
     /**
      * Composes a connection request.
      * @param message A message.

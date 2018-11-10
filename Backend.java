@@ -381,7 +381,7 @@ public class Backend {
         userListServer.remove(user);
         connectedUsersCount--;
 
-        user.getClientSocket().send(Composer.getDisconnectMessage());
+        user.getClientSocket().send(Composer.DISCONNECT_MESSAGE);
         user.getClientSocket().close();
 
         if (userList.size() <= 0)

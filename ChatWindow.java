@@ -29,15 +29,17 @@ public class ChatWindow extends JEditorPane {
     private Element body;
     private Element table;
     private Transformer transformer;
+    private String name;
 
     /** A list of all the received messages */
     private List<Message> messages;
 
     /**
      * Creates the initial view when another person connects.
-     * @param otherUser The other user, extract name from this object.
+     * @param name The name of the other user
      */
-    public ChatWindow(User otherUser) {
+    public ChatWindow(String name) {
+        this.name = name;
         try {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -61,7 +63,7 @@ public class ChatWindow extends JEditorPane {
         rightCol.setAttribute("width", "15%");
 
         leftCol.setTextContent("***");
-        messageCol.setTextContent(otherUser.getName() + " is now connected.");
+        messageCol.setTextContent(name + " is now connected.");
         rightCol.setTextContent("***");
 
         /* Add all HTML elements to document */
@@ -107,7 +109,10 @@ public class ChatWindow extends JEditorPane {
      * @param msg The message to be added.
      */
     public void addMessage(Message msg) {
-        addTableElement(msg.getUsername() + "\n" + msg.getTime(), msg.getMessage(), "", msg.getColor());
+        if (msg.getUsername().equals("")) 
+            addTableElement(name + "\n" + msg.getTime(), msg.getMessage(), "", msg.getColor());
+        else
+            addTableElement(msg.getUsername() + "\n" + msg.getTime(), msg.getMessage(), "", msg.getColor());
         refreshWindow();
     }
 

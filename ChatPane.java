@@ -127,13 +127,12 @@ public class ChatPane extends JPanel {
 
         /* Start multipart on all clients also */
         for (User user : users) {
-            System.out.println(user);
-            user.getClientSocket().send("<message multipart=\"start\"></message>");
+            user.getClientSocket().send(Composer.MULTIPART_START);
         }
     }
 
     private void createGUI() {
-        chatWindow = new ChatWindow(users.get(0));
+        chatWindow = new ChatWindow(users.get(0).getName());
         scrollPane = new JScrollPane(chatWindow);
         msgField = new JTextField();
 
@@ -345,7 +344,7 @@ public class ChatPane extends JPanel {
     }
 
     public void addUser(User user) {
-        user.getClientSocket().send("<message multipart=\"start\"></message>");
+        user.getClientSocket().send(Composer.MULTIPART_START);
         addMessage(new Message(user + "connected."));
         users.add(user);
     }
