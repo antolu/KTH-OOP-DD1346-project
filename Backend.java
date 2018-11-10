@@ -138,14 +138,17 @@ public class Backend {
             if (msg.getMultipartMode().equals("server")) {
                 
                 multipartMap.get(user).addMessage(msg);
+                return;
             }
             else if (msg.getMultipartMode().equals("client")) {
                 if (multiPartPane != null) {
                     for (User usr : userListServer) {
+                        if (usr == user) continue;
                         usr.getClientSocket().send(msg.getOriginalMessage());
                     }
                     multiPartPane.addMessage(msg);
                 }
+                return;
             }
 
             ChatPane chatPane = chatMap.get(user);
@@ -378,7 +381,7 @@ public class Backend {
         user.getClientSocket().send(Composer.getDisconnectMessage());
         user.getClientSocket().close();
 
-        if (userListServer.size() <= 0)
+        if (userList.size() <= 0)
             connectedUsersCount = 0;
             menuBar.disableDisconnectButton();
 
