@@ -115,7 +115,7 @@ public class ChatPane extends JPanel {
 
         isMultipartServer = true;
 
-        users = new ArrayList<>();
+        // users = new ArrayList<>();
         sockets = new ArrayList<>();
         encryptionKeys = new HashMap<>();
 
@@ -127,7 +127,7 @@ public class ChatPane extends JPanel {
 
         /* Start multipart on all clients also */
         for (User user : users) {
-            System.err.println(user);
+            System.out.println(user);
             user.getClientSocket().send("<message multipart=\"start\"></message>");
         }
     }
