@@ -213,13 +213,17 @@ public class ChatPane extends JPanel {
     private void addActionListeners(ChatPane pane) {
         sendButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                sendMessage();
+                String msg = msgField.getText();
+                if (msg.equals("")) return;
+                sendMessage(msg); 
             }
         });
 
         msgField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                sendMessage(); 
+                String msg = msgField.getText();
+                if (msg.equals("")) return;
+                sendMessage(msg); 
             }
         });
 
@@ -297,8 +301,8 @@ public class ChatPane extends JPanel {
         });
     }
 
-    private void sendMessage() {
-        String message = msgField.getText();
+    private void sendMessage(String message) {
+  
         msgField.setText("");
         Message msg = new Message(message, currentColor, dtf.format(LocalDateTime.now()), "Me");
         chatWindow.sentMessage(msg);
@@ -348,10 +352,11 @@ public class ChatPane extends JPanel {
     
     public void removeUser(User user) {
         users.remove(user);
+        sendMessage(user + "disconnected.");
     }
 
     private void close() {
-        if (sendButton.isEnabled()) 
+        if (!isMultipartClient && sendButton.isEnabled()) 
             disconnect();
 
         backend.close(this, users.get(0));
