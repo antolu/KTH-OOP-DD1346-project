@@ -385,7 +385,6 @@ public class Backend {
         user.getClientSocket().close();
 
         if (userList.size() <= 0)
-            connectedUsersCount = 0;
             menuBar.disableDisconnectButton();
 
         if (multipartMap.containsKey(user)) {
