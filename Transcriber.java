@@ -100,7 +100,9 @@ public class Transcriber {
 
             Element message = doc.getDocumentElement();
             if (message.getTagName() == "message") {
-                if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
+                if (message.getAttribute("multipart").equals("start"))
+                    return new Query("<multipartstart />");
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
                     return parseFileRequest((Element) message.getChildNodes().item(0), socket);
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
                     return parseFileResponse((Element) message.getChildNodes().item(0));
