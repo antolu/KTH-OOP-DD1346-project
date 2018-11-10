@@ -312,7 +312,7 @@ public class Backend {
             multiPartPane.setName("general");
             tabbedPane.add(multiPartPane, 0);
         }
-        if (multiPartPane != null) {
+        else if (multiPartPane != null) {
             multiPartPane.addUser(user);
         }
 
