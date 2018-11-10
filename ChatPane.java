@@ -127,6 +127,7 @@ public class ChatPane extends JPanel {
 
         /* Start multipart on all clients also */
         for (User user : users) {
+            System.err.println(user);
             user.getClientSocket().send("<message multipart=\"start\"></message>");
         }
     }
