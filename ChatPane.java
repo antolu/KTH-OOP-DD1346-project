@@ -364,12 +364,7 @@ public class ChatPane extends JPanel {
 
     private void disconnect() {
         chatWindow.addMessage(new Message("You disconnected.", "000000", "", ""));
-        disconnectExternal();
-    }
-
-    public void disconnectExternal() {
         disable();
-
         backend.disconnect(users.get(0));
     }
 
@@ -382,7 +377,6 @@ public class ChatPane extends JPanel {
         disconnectButton.setEnabled(false);
         setColorButton.setEnabled(false);
         msgField.setEditable(false);
-
     }
 
     /**

@@ -209,7 +209,8 @@ public class Backend {
         else if (query.getMessage().equals("<disconnect />")) {
             ChatPane chatPane = chatMap.get(user);
             chatPane.addMessage(new Message(user + " disconnected.", "000000", "", ""));
-            chatPane.disconnectExternal();
+            chatPane.disable();
+            disconnect(user);
 
             if (multiPartPane != null) {
                 multiPartPane.addMessage(new Message(user.getName() + " disconnected."));
@@ -361,8 +362,10 @@ public class Backend {
     public void disconnectAll() {
         for (int i = 0; i < userList.size(); i++)
         {
-            chatMap.get(userList.get(i)).addMessage(new Message("You disconnected."));
-            chatMap.get(userList.get(i)).disconnectExternal();
+            User user = userList.get(i);
+            chatMap.get(user).addMessage(new Message("You disconnected."));
+            chatMap.get(user).disable();
+            disconnect(user);
         }
     }
 
