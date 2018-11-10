@@ -42,8 +42,6 @@ public class Backend {
     private JTabbedPane tabbedPane;
     /** The mother of sockets */
     private ServerSocket serverSocket;
-    /** A list of all generated sockets */
-    private List<Socket> socketList;
     /** A list of all connected, or previously connected users */
     private List<User> userList;
     private List<User> userListServer;
@@ -54,8 +52,6 @@ public class Backend {
 
     private String myName;
     private int port;
-
-    private int connectedUsersCount = 0;
 
     private ChatPane chatPane;
 
@@ -71,25 +67,36 @@ public class Backend {
      */
     public Backend(int port, String name, ServerSocket serverSocket) {
         Encrypter.initialize();
+
+        /* Initialize all "storage" */
         chatMap = new HashMap<User, ChatPane>();
         multipartMap = new HashMap<>();
         userMap = new HashMap<String, User>();
         userList = new ArrayList<User>();
         userListServer = new ArrayList<>();
 
+        /* Save other info */
         myName = name;
         this.port = port;
         this.serverSocket = serverSocket;
 
         createGUI();
+
+        /* Start listening for incoming connections */
         waitForConnections(this);
     }
 
+    /**
+     * Creates and displays the general chat
+     * GUI
+     */
     private void createGUI() {
         frame = new JFrame("Chat");
         menuBar = new MenuBar(this);
 
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        /** Disconnect all users/sockets if window is closed */
         frame.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -100,6 +107,7 @@ public class Backend {
                     JOptionPane.QUESTION_MESSAGE, null, null, null);
                 if (confirm == 0) {
                     disconnectAll();
+                    disconnectServerSocket();
                     System.exit(0);
                 }
             }
@@ -112,12 +120,6 @@ public class Backend {
         frame.setPreferredSize(new Dimension(770, 560));
         frame.add(menuBar, BorderLayout.NORTH);
         frame.add(tabbedPane, BorderLayout.SOUTH);
-
-        // User testUser = new User("Other", "OtherIP");
-        // chatPane = new ChatPane(testUser);
-
-        // tabbedPane.add(testUser.getName(), chatPane);
-        // new MessageTest(this);
 
         frame.pack();
         frame.setVisible(true);
@@ -132,16 +134,20 @@ public class Backend {
     public void receiveMessage(Query query, SocketClient socket) {
         User user = userMap.get(socket.getSocketID());
         
+        /* If is a new message */
         if (query instanceof Message) {
             Message msg = (Message) query;
             
+            /* If sent from a multipart server */
             if (msg.getMultipartMode().equals("server")) {
-                
+                /* Display msg to the correct chat (if multiple multiparts) */
                 multipartMap.get(user).addMessage(msg);
                 return;
             }
+            /* If sent from a multipart client */
             else if (msg.getMultipartMode().equals("client")) {
                 if (multiPartPane != null) {
+                    /* Forward message to all other clients */
                     for (User usr : userListServer) {
                         if (usr == user) continue;
                         usr.getClientSocket().send(msg.getOriginalMessage());
@@ -154,13 +160,19 @@ public class Backend {
             ChatPane chatPane = chatMap.get(user);
             chatPane.addMessage(msg);
         }
+        /* If is a new connection request */
         else if (query instanceof Request) {
             Request request = (Request) query;
             User newUser = new User(request.getName(), socket.getSocketID(), socket);
+
+            /* Display prompt */
             showConnectionRequest(request, newUser);
         }
+        /* If is a reponse to a connection request */
         else if (query instanceof RequestResponse) {
             RequestResponse response = (RequestResponse) query;
+
+            /* Add connection only if a "yes" is received */
             if (response.getReply().equals("yes")) {
                 addConnectionAsClient(response.getName(), socket);
             }
@@ -211,6 +223,7 @@ public class Backend {
             chatPane.disable();
             disconnect(user);
 
+            /* If multipart chat is active, remove user from it */
             if (multiPartPane != null) {
                 multiPartPane.addMessage(new Message(user.getName() + " disconnected."));
                 multiPartPane.removeUser(user);
@@ -236,6 +249,8 @@ public class Backend {
         }
 
         final Backend backendHere = this;
+
+        /* Actually display the request */
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 new InConnectionPrompt(request.getMessage(), user, backendHere);
@@ -243,7 +258,12 @@ public class Backend {
         });
     }
 
-
+    /**
+     * Internal method for creating a new multipart chat as a client. Creates
+     * a new chatpane and registers it internally for receiving future messages
+     * from the multipart chat.
+     * @param socket The socket that the mutlipart chat is sent with
+     */
     private void newClientMultipartConnection(SocketClient socket) {
         User user = userMap.get(socket.getSocketID());
         ChatPane newPane = new ChatPane(this, user, true);
@@ -284,6 +304,7 @@ public class Backend {
 
         ChatPane newPane = new ChatPane(this, newUser, false);
 
+        /* Save new chatpane and add it to the GUI */
         chatMap.put(newUser, newPane);
         tabbedPane.addTab(name, newPane);
     }
@@ -298,24 +319,27 @@ public class Backend {
     public void addConnectionAsServer(User user) {
         user.getClientSocket().send(Composer.composeRequestReply(myName, "yes"));
 
-        connectedUsersCount++;
         menuBar.enableDisconnectButton();
 
+        /* Save user to memory */
         userList.add(user);
         userListServer.add(user);
         userMap.put(user.getClientSocket().getSocketID(), user);
 
         ChatPane newPane = new ChatPane(this, user, false);
 
+        /* Create a multipart chat if conditions are met */
         if (userListServer.size() > 1 && multiPartPane == null) {
             multiPartPane = new ChatPane(this, userListServer);
             multiPartPane.setName("general");
             tabbedPane.add(multiPartPane, 0);
         }
+        /* Add user to multipart chat if it already exists */
         else if (multiPartPane != null) {
             multiPartPane.addUser(user);
         }
 
+        /* Save chat tpane to memory and display it graphically */
         chatMap.put(user, newPane);
         tabbedPane.addTab(user.getName(), newPane);
     }
@@ -341,6 +365,10 @@ public class Backend {
         newSocket.start();
     }
 
+    /**
+     * Continually listen for incoming connections
+     * @param backend this backend object.
+     */
     private void waitForConnections(Backend backend) {
         new Thread(new Runnable()
         {
@@ -358,6 +386,9 @@ public class Backend {
         }).start();
     }
     
+    /**
+     * Disconnect all connections
+     */
     public void disconnectAll() {
         for (int i = 0; i < userList.size(); i++)
         {
@@ -373,19 +404,22 @@ public class Backend {
      * disconnect string to the other-end socket if this is
      * the disconnecting end. Else inform the user in the correct
      * ChatPane that user has disconnected. Keep the ChatPane open.
-     * @param socket The socket that should be closed. 
+     * @param user The socket that should be closed. 
      */
     public void disconnect(User user) {
+        /* De-register the user */
         userList.remove(user);
         userListServer.remove(user);
-        connectedUsersCount--;
 
+        /* Send disconnect message to other user and close the socket */
         user.getClientSocket().send(Composer.DISCONNECT_MESSAGE);
         user.getClientSocket().close();
 
+        /* Disable the disconnect all button if nothing left to disconnect */
         if (userList.size() <= 0)
             menuBar.disableDisconnectButton();
 
+        /* Remove the user from the multipart chat */
         if (multipartMap.containsKey(user)) {
             ChatPane multipartPane = multipartMap.get(user);
             multipartMap.remove(user);
@@ -396,13 +430,21 @@ public class Backend {
         }
     }
     
+    /**
+     * Closes a chat pane from the GUI
+     * @param chatPane The chat pane to be removed
+     * @param user The user associated with the chat pane to be removed
+     */
     public void close(ChatPane chatPane, User user) {
         userMap.remove(user.getClientSocket().getSocketID());
         chatMap.remove(user);
         tabbedPane.remove(chatPane);
     }
 
-
+    /**
+     * Updates the name of the user
+     * @param newName The new Name
+     */
     public void updateName(String newName) {
         if (newName.equals("")) {
             myName = serverSocket.getLocalSocketAddress().toString();
@@ -412,14 +454,16 @@ public class Backend {
         }
     }
 
-    public void disconnect() {
+    /**
+     * Closes the server socket
+     */
+    public void disconnectServerSocket() {
         try {
             serverSocket.close();
         }
         catch (IOException e) {
             System.err.println("Server socket failed to close");
         }
-        // 
     }
 
     /**
