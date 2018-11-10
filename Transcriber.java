@@ -269,7 +269,7 @@ public class Transcriber {
             TransformerFactory tf = TransformerFactory.newInstance();
             Transformer transformer = tf.newTransformer();
             transformer.transform(domSource, result);
-            return writer.toString();
+            return writer.toString().replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim();
         }
         catch (Exception e) {
             e.printStackTrace();
