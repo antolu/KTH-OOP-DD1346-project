@@ -345,13 +345,13 @@ public class ChatPane extends JPanel {
 
     public void addUser(User user) {
         user.getClientSocket().send(Composer.MULTIPART_START);
-        addMessage(new Message(user + "connected."));
+        addMessage(new Message(user + " connected."));
         users.add(user);
     }
     
     public void removeUser(User user) {
         users.remove(user);
-        sendMessage(user + "disconnected.");
+        sendMessage(user + " disconnected.");
     }
 
     private void close() {

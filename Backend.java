@@ -208,7 +208,6 @@ public class Backend {
         }
         else if (query.getMessage().equals("<disconnect />")) {
             ChatPane chatPane = chatMap.get(user);
-            chatPane.addMessage(new Message(user + " disconnected.", "000000", "", ""));
             chatPane.disable();
             disconnect(user);
 
