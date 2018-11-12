@@ -60,11 +60,12 @@ public class FileHandler{
         isRunning = true;
         socketClient = messageSocket;
         String host = filerequest.getIP();
+        host = host.replaceAll("/", "").trim();
 
         int port = Integer.parseInt(filerequest.getPort());
 
         try{
-            mySocket = new Socket("localhost",port);
+            mySocket = new Socket(host,port);
         }catch(IOException e){
             //do something
             System.out.println("Could not connect to port");
