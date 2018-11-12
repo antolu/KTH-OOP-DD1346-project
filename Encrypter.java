@@ -98,13 +98,18 @@ public class Encrypter {
     }
 
     private static byte[] decryptAES(String key, byte[] toDecrypt) throws Exception {
+        byte[] decodedBytes = Base64.getDecoder().decode(toDecrypt);
+
         byte[] decodedKey = Base64.getDecoder().decode(key);
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
-        // SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
-        Cipher cipher = Cipher.getInstance("AES");
 
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        return cipher.doFinal(toDecrypt);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+        byte[] ivByte = new byte[cipher.getBlockSize()];
+        IvParameterSpec ivParamsSpec = new IvParameterSpec(ivByte);
+
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParamsSpec);
+        return cipher.doFinal(decodedBytes);
     }
 
     private static byte[] decryptRSA(String key, byte[] toDecrypt) {
@@ -141,13 +146,14 @@ public class Encrypter {
     }
 
     private static byte[] encryptAES(String key, byte[] toEncrypt) throws Exception {
-        // SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(), "AES");
         byte[] decodedKey = Base64.getDecoder().decode(key);
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
-        Cipher cipher = Cipher.getInstance("AES");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        byte[] ivByte = new byte[cipher.getBlockSize()];
+        IvParameterSpec ivParamsSpec = new IvParameterSpec(ivByte);
 
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParamsSpec);
         return cipher.doFinal(toEncrypt);
     }
 
