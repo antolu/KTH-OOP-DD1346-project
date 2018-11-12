@@ -43,7 +43,7 @@ public class SocketClient implements Runnable {
 	 * Receives messages from the sockets.
      * @return Returns te received string
 	 */
-	private String receive() {
+	public String receive() {
         StringBuilder string = new StringBuilder();
 
         try {
@@ -75,7 +75,7 @@ public class SocketClient implements Runnable {
      * @return The IP adress of the other end of the socket.
      */
     public String getSocketID() {
-        return ((InetSocketAddress) clientSocket.getRemoteSocketAddress()).getAddress().toString();
+        return ((InetSocketAddress) clientSocket.getRemoteSocketAddress()).getAddress().toString().replaceAll("/", "").trim();
     }
 
     /**
