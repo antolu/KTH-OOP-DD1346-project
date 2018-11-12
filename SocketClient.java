@@ -66,6 +66,7 @@ public class SocketClient implements Runnable {
 	 */
 	public void send(String msg) {
         msg.replaceAll("\n", ""); // Remove all line breaks
+        System.err.println("Sent message: " + message);
         out.println(msg);
         out.flush();
     }
