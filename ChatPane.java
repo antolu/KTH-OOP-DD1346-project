@@ -103,6 +103,7 @@ public class ChatPane extends JPanel {
      */
     public ChatPane(Backend backend, List<User> users) {
         this.backend = backend;
+        this.users = users;
 
         isMultipartServer = true;
 
