@@ -75,7 +75,13 @@ public class SocketClient implements Runnable {
      * @return The IP adress of the other end of the socket.
      */
     public String getSocketID() {
-        return ((InetSocketAddress) clientSocket.getRemoteSocketAddress()).getAddress().toString().replaceAll("/", "").trim();
+        String clientS = ((InetSocketAddress) clientSocket.getRemoteSocketAddress()).getAddress().toString().replaceAll("/", "").trim();
+
+        if(clientS.contains("localhost")){
+            clientS = "localhost";
+        }
+        
+        return clientS;
     }
 
     /**
