@@ -61,6 +61,10 @@ public class FileHandler{
         socketClient = messageSocket;
         String host = filerequest.getIP();
 
+        if(host.contains("localhost")){
+            host="localhost";
+        }
+
         int port = Integer.parseInt(filerequest.getPort());
 
         try{
@@ -70,13 +74,7 @@ public class FileHandler{
             System.out.println("Could not connect to port");
             return;
         }
-        //System.out.println(host);
-        //System.out.println(port);
-        /*try {
-            client = new Socket("localhost", port);
-        }catch(IOException e) {
-            //do something
-        }*/
+
 
         JFrame fileRequestFrame = new JFrame("File Request");
         fileRequestFrame.setLocationRelativeTo(null);
