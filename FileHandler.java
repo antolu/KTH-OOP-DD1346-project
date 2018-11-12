@@ -80,6 +80,7 @@ public class FileHandler{
         }*/
 
         JFrame fileRequestFrame = new JFrame("File Request");
+        fileRequestFrame.setLocationRelativeTo(null);
         fileRequestFrame.setSize(400,300);
         System.out.println(filerequest.getFileSize());
         int fileSize = Integer.parseInt(filerequest.getFileSize());
@@ -100,98 +101,100 @@ public class FileHandler{
         JButton decline = new JButton("No");
         accept.setBounds(100,100,60,40);
         decline.setBounds(240,100,60,40);
-       // BufferedInputStream in =null;
+
+        JFrame progressFrame = new JFrame("Progress");
+        JProgressBar progress=new JProgressBar(JProgressBar.HORIZONTAL,0,100);
+        JLabel progressLabel = new JLabel("Downloading from user "+user.getName());
+
+        final String amountLabel = "Amount downloaded: ";
+        JLabel amountReceived = new JLabel(amountLabel);
+        progress.setMinimum(0);
+        progress.setMaximum(100);
+        progress.setValue(0);
+        progressFrame.add(progressLabel);
+        progressFrame.add(amountReceived);
+        progressFrame.add(progress);
+        progressFrame.setLayout(new FlowLayout());
+        progressFrame.setSize(300,200);
+
 
         accept.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
 
-                SendResponse(message.getText(), "Yes");
+                new Thread(new Runnable() {
+                    public void run() {
+                        fileRequestFrame.dispose();
+                        SendResponse(message.getText(), "Yes");
 
-                File f = new File(filename);
+                        File f = new File(filename);
 
-                try{
-                    InputStream in = null;
-                    OutputStream out = null;
+                        try {
+                            InputStream in = null;
+                            OutputStream out = null;
 
-                    try {
-                        in = mySocket.getInputStream();
-                        System.out.println("Accept action listener: client created");
-                    } catch (IOException ex) {
-                        System.out.println("Can't get socket input stream. ");
-                    }
+                            try {
+                                in = mySocket.getInputStream();
+                                System.out.println("Accept action listener: client created");
+                            } catch (IOException ex) {
+                                System.out.println("Can't get socket input stream. ");
+                            }
 
-                    try {
-                        out = new FileOutputStream(filename);
-                        System.out.println("Accept action listener: File output stream created");
-                    } catch (FileNotFoundException ex) {
-                        System.out.println("File not found. ");
-                    }
+                            try {
+                                out = new FileOutputStream(filename);
+                                System.out.println("Accept action listener: File output stream created");
+                            } catch (FileNotFoundException ex) {
+                                System.out.println("File not found. ");
+                            }
 
-                    byte[] bytes = new byte[1024];
-                    double percentageReceived=0;
-                    int count;
-                    double totalReceived=0.0;
+                            byte[] bytes = new byte[1024];
+                            double percentageReceived = 0;
+                            int count;
+                            double totalReceived = 0.0;
 
-                    JFrame frame = new JFrame("JFrame Example");
-                    JButton button = new JButton();
-                    JPanel panel = new JPanel(new FlowLayout());
-                    panel.add(button);
+                            while ((count = in.read(bytes)) > 0) {
 
-                    button.setText("Press me");
-                    button.setPreferredSize(new Dimension(100, 30));
+                                totalReceived = totalReceived + count;
+                                percentageReceived = totalReceived / fileSize * 100.0;
 
-                    frame.getContentPane().add(panel);
-                    panel.setSize(300, 300);
-                   // frame.setLocationRelativeTo(null);
-                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                                final int tmpPercent = (int) percentageReceived;
+                                final int tmpReceived = (int)totalReceived;
+                                final int tmpFile = fileSize;
 
-                    frame.pack();
-                    frame.setVisible(true);
-                    fileRequestFrame.dispose();
+                                SwingUtilities.invokeLater(new Runnable(){
+                                    public void run(){
+                                        progressFrame.setVisible(true);
+                                        progress.setValue(tmpPercent);
+                                        amountReceived.setText(amountLabel+Integer.toString(tmpReceived));
+                                        progressFrame.repaint();
 
-                    /*JProgressBar progressBar = new JProgressBar();
-                    JLabel progressLabel = new JLabel("Current kb of file to download from user "+user.getName());
+                                        if(tmpReceived==tmpFile){
+                                            progressLabel.setText("Saving file to computer");
+                                        }
+                                    }
+                                });
 
-                    progressBar.setMinimum(0);
-                    progressBar.setMaximum(100);
-                    progressBar.setValue(0);
-                    //testFrame.add(progressBar);
-                    testFrame.add(progressLabel);
-                    testFrame.setLayout(new FlowLayout());
-                    testFrame.setSize(200,200);
-                    testFrame.setVisible(true);
-                    System.out.println("created frame");*/
+                                out.write(bytes, 0, count);
 
-                    while ((count = in.read(bytes)) > 0) {
+                                try {
+                                    Thread.sleep(50);
+                                } catch (InterruptedException e4) {
+                                    //do something
+                                }
+                            }
 
+                            SwingUtilities.invokeLater(new Runnable(){
+                                public void run(){
+                                    progressFrame.dispose();
+                                }
+                            });
 
-                        System.out.println(totalReceived);
-                        totalReceived = totalReceived+count;
-                        percentageReceived = totalReceived/fileSize*100.0;
-                       // progressBar.setValue((int)percentageReceived);
-                       // fileRequestFrame.repaint();
-                        out.write(bytes, 0, count);
-
-
-                        try{
-                            Thread.sleep(50);
-                        }catch(InterruptedException e4){
+                        } catch (IOException e2) {
                             //do something
                         }
+
+                        isRunning = false;
                     }
-
-                    try{
-                        Thread.sleep(2000);
-                    }catch(InterruptedException e3){
-                        //do something
-                    }
-                    frame.dispose();
-
-                }catch(IOException e2 ) {
-                    //do something
-                }
-
-                isRunning = false;
+                }).start();
             }
         });
 
@@ -238,7 +241,6 @@ public class FileHandler{
         file = inFile;
 
         server = inServer;
-        //Create in and out-writer
         isRunning = true;
 
         Thread t = new Thread(username){
@@ -329,11 +331,8 @@ public class FileHandler{
         String reply = fileResponse.getReply();
         String responseMessage = fileResponse.getMessage();
 
-        System.out.println("THE REPLY: "+reply);
-        System.out.println(reply.equals("Yes"));
         //all the things used as file,socket etc needs to be saved somewhere before
         if(reply.equals("Yes")) {
-            System.out.println("in if-statement");
 
             try{
                 clientSocket = server.accept();
@@ -346,17 +345,19 @@ public class FileHandler{
 
             JFrame progressFrame = new JFrame();
             JProgressBar progressBar = new JProgressBar();
-            JLabel progressLabel = new JLabel("<html>Sending file to "+ user.getName()+"<br>Current kb of file transfer</html>");
+            JLabel userInfo = new JLabel("Sending file to "+ user.getName());
+            String pInfo = "Current amout of kb transfered: ";
+            JLabel progressInfo = new JLabel(pInfo);
             progressBar.setMinimum(0);
             progressBar.setMaximum(100);
+            progressFrame.add(userInfo);
             progressFrame.add(progressBar);
-            progressFrame.add(progressLabel);
+            progressFrame.add(progressInfo);
             progressFrame.setLayout(new FlowLayout());
-            progressFrame.setSize(200,200);
+            progressFrame.setSize(300,200);
 
             // Get the size of the file
             long length = file.length();
-            System.out.println(length);
             byte[] bytes = new byte[1024];
 
             try {
@@ -371,7 +372,7 @@ public class FileHandler{
                 //do something
             }
 
-            double percentageSent=0;
+            double percentageSent=0.0;
             int count;
             double totalSent=0.0;
 
@@ -381,10 +382,10 @@ public class FileHandler{
 
                 while ((count = in.read(bytes)) > 0) {
 
-                    System.out.println(totalSent);
                     totalSent = totalSent+count;
-                    percentageSent = totalSent/length*100.0;
+                    percentageSent = totalSent / length * 100.0;
                     progressBar.setValue((int)percentageSent);
+                    progressInfo.setText(pInfo+(int)totalSent);
                     progressFrame.repaint();
 
                     out.write(bytes, 0, count);
@@ -399,10 +400,13 @@ public class FileHandler{
                 //do something
             }
 
+            progressInfo.setText("The file has been transfered!");
+            Thread.sleep(5000);
+
             progressFrame.dispose();
 
             //os.flush();
-            Thread.sleep(5000);
+
             try {
                 clientSocket.close();
                 server.close();
