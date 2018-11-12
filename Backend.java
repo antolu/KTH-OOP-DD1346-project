@@ -161,13 +161,13 @@ public class Backend {
             chatPane.addMessage(msg);
         }
         /* If is a new connection request */
-        else if (query instanceof Request) {
-            Request request = (Request) query;
-            User newUser = new User(request.getName(), socket.getSocketID(), socket);
+        // else if (query instanceof Request) {
+        //     Request request = (Request) query;
+        //     User newUser = new User(request.getName(), socket.getSocketID(), socket);
 
-            /* Display prompt */
-            showConnectionRequest(request, newUser);
-        }
+        //     /* Display prompt */
+        //     showConnectionRequest(request, newUser);
+        // }
         /* If is a reponse to a connection request */
         else if (query instanceof RequestResponse) {
             RequestResponse response = (RequestResponse) query;
@@ -241,9 +241,12 @@ public class Backend {
      * @param request The message encapsulated in the connection
      * request. 
      */
-    private void showConnectionRequest(Request request, User user) {
+    private void showConnectionRequest(Request request, User user, Boolean isPrimitive) {
         if (userList.size() >= MAX_CONNECTIONS) {
-            user.getClientSocket().send(Composer.composeRequestReply(myName, "no"));
+            if (isPrimitive)
+                user.getClientSocket().send("<message>No</message>");
+            else 
+                user.getClientSocket().send(Composer.composeRequestReply(myName, "no"));
             JOptionPane.showMessageDialog(frame, "An user from " + user.getClientSocket().getSocketID() + " has tried to connect to you, but the max supported number of connections has been reached.");
             user.getClientSocket().close();
         }
@@ -253,7 +256,7 @@ public class Backend {
         /* Actually display the request */
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                new InConnectionPrompt(request.getMessage(), user, backendHere);
+                new InConnectionPrompt(request.getMessage(), user, backendHere, isPrimitive);
             }
         });
     }
@@ -362,6 +365,63 @@ public class Backend {
         }
         SocketClient newSocket = new SocketClient(socket, this);
 
+        /* Wait for request message */
+        int timeout = 1000;
+        final int WAIT_TIME = 100;
+
+        String message;
+        Query parsedMessage;
+
+        while (true) {
+            message = newSocket.receive();
+            System.err.println("Received connection request: " + message);
+
+            /* Do not parse empty messages */
+            if (message.equals("") || message == null)
+                continue;
+
+            /* Parse the message */
+            parsedMessage = Transcriber.parse(message, newSocket);
+
+            if (parsedMessage instanceof Request) {
+                Request request = (Request) parsedMessage;
+                User newUser = new User(request.getName(), newSocket.getSocketID(), newSocket);
+    
+                /* Display prompt */
+                showConnectionRequest(request, newUser, false);
+                break;
+            }
+            else if (parsedMessage instanceof Message) {
+                Message msg = (Message) parsedMessage;
+                User newUser = new User("", newSocket.getSocketID(), newSocket);
+
+                Request fakeRequest = new Request("Does not say anything.", newSocket.getSocketID());
+    
+                /* Display prompt */
+                showConnectionRequest(fakeRequest, newUser, true);
+                break;
+            }
+
+            try {
+                Thread.sleep(WAIT_TIME);
+                timeout -= WAIT_TIME;
+            } catch (InterruptedException e) {
+                timeout -= WAIT_TIME;
+            }
+
+            /* Other end will not send a request, probably a primitive user */
+            if (timeout <= 0) {
+                User newUser = new User("", newSocket.getSocketID(), newSocket);
+
+                Request fakeRequest = new Request("Does not say anything.", newSocket.getSocketID());
+    
+                /* Display prompt */
+                showConnectionRequest(fakeRequest, newUser, true);
+                break;
+            }
+        }
+
+        /* Start listening for actual messages */
         newSocket.start();
     }
 

@@ -21,6 +21,7 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
 
     private Backend backend;
     private User user;
+    private Boolean isPrimitive;
 
     /**
      * Creates and displays the GUI
@@ -28,9 +29,10 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
      * @param user The user who send the request.
      * @param backend The backend. Used to process the answer of the user.
      */
-    public InConnectionPrompt(String message, User user, Backend backend) {
+    public InConnectionPrompt(String message, User user, Backend backend, Boolean isPrimitive) {
         this.backend = backend;
         this.user = user;
+        this.isPrimitive = isPrimitive;
 
         /* Create and format pretty buttons */
         acceptButton = new JButton();
@@ -53,7 +55,10 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
 
         /* Display some text and the message */
         JLabel text = new JLabel();
-        text.setText("<html>" + user.getName() + " wants to connect to you. Hen says: <br> " + message + " <br> Do you accept? </html>");
+        if (isPrimitive)
+            text.setText("<html>" + user.getName() + " is using a primitive version of the chat client and wants to connect to you. Hen says: <br> " + message + " <br> Do you accept? </html>");
+        else
+            text.setText("<html>" + user.getName() + " wants to connect to you. Hen says: <br> " + message + " <br> Do you accept? </html>");
         text.setPreferredSize(new Dimension(220, 100));
 
         /*Actually display the GUI */
@@ -84,7 +89,10 @@ public class InConnectionPrompt extends JPanel implements ActionListener {
             backend.addConnectionAsServer(user);
         } else if (e.getSource() == denyButton) {
             /* Send a response to the other user */
-            user.getClientSocket().send(Composer.composeRequestReply(backend.getMyName(), "no"));
+            if (isPrimitive)
+                user.getClientSocket().send("<message>No</message>");
+            else
+                user.getClientSocket().send(Composer.composeRequestReply(backend.getMyName(), "no"));
             
             /* Close the socket */
             user.getClientSocket().close();
