@@ -30,8 +30,8 @@ import javax.xml.transform.stream.*;
  * message incapsulated in a Message object.
  */
 public class Transcriber {
-    private static final String errorMsg = "Incorrectly formatted message. Content omitted.";
-    private static DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final String ERROR_MSG = "Incorrectly formatted message. Content omitted.";
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     /**
      * Converts a byte array to a human readable string
@@ -113,10 +113,10 @@ public class Transcriber {
             else if (message.getTagName() == "keyrequest") {
                 return parseKeyRequest(message);
             }
-            return new Message(errorMsg);
+            return new Message(ERROR_MSG);
         } catch(Exception e) {
             e.printStackTrace();
-            return new Message(errorMsg);
+            return new Message(ERROR_MSG);
         }
     }
 
@@ -162,7 +162,7 @@ public class Transcriber {
 
         /* Retrieve other information from the code */
         String color = text.getAttribute("color");
-        String time = dtf.format(LocalDateTime.now());
+        String time = DTF.format(LocalDateTime.now());
 
         Message msg = new Message(unescapeHtml4(textMessage), color, time, rootElement.getAttribute("name"));
 
