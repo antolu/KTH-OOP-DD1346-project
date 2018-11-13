@@ -52,6 +52,7 @@ public class ChatPane extends JPanel {
     private JButton disconnectButton;
     private ToggleableButton encryptButton;
     private JButton closeButton;
+    private JButton keyRequest;
 
     /** Placeholder for multipart chats */
     private List<User> users;
@@ -69,6 +70,7 @@ public class ChatPane extends JPanel {
     private Boolean isMultipartServer = false;
     private Boolean isMultipartClient = false;
     private FileHandler fileHandler;
+    private KeyRequestChooser keyRequestChooser;
 
     /**
      * Basic constructor.
@@ -83,6 +85,7 @@ public class ChatPane extends JPanel {
         users = new ArrayList<>();
         users.add(user);
         this.fileHandler = new FileHandler(users.get(0));
+        this.keyRequestChooser = new KeyRequestChooser(users.get(0));
         encryptionKeys = new HashMap<>();
 
         createGUI();
@@ -142,6 +145,7 @@ public class ChatPane extends JPanel {
         sendButton = new JButton();
         encryptButton = new ToggleableButton("Encrypted", "Decrypted");
         closeButton = new JButton();
+        keyRequest = new JButton();
 
         sendFileButton.setText("Send file");
         setEncryptionButton.setText("Set encryption");
@@ -150,6 +154,7 @@ public class ChatPane extends JPanel {
         sendButton.setText("Send");
         encryptButton.setText("Encrypt");
         closeButton.setText("Close");
+        keyRequest.setText("Key request");
 
         sendFileButton.setMaximumSize(new Dimension(140, 30));
         setEncryptionButton.setMaximumSize(new Dimension(140, 30));
@@ -158,6 +163,7 @@ public class ChatPane extends JPanel {
         sendButton.setMaximumSize(new Dimension(95, 30));
         encryptButton.setMaximumSize(new Dimension(95, 30));
         closeButton.setMaximumSize(new Dimension(140, 30));
+        keyRequest.setMaximumSize(new Dimension(140, 30));
 
         sendFileButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         setEncryptionButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -166,6 +172,7 @@ public class ChatPane extends JPanel {
         closeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         sendButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         encryptButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        keyRequest.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         /* Build all the other layers in the GUI */
         JPanel leftPanel = new JPanel();
@@ -198,6 +205,7 @@ public class ChatPane extends JPanel {
         rightPanel.add(setColorButton);
         rightPanel.add(disconnectButton);
         rightPanel.add(closeButton);
+        rightPanel.add(keyRequest);
 
         this.add(leftPanel, BorderLayout.WEST);
         this.add(rightPanel, BorderLayout.WEST);
@@ -274,7 +282,7 @@ public class ChatPane extends JPanel {
                         if(!currentEncryptionType.equals("")) {
                             encrKey=encryptionKeys.get(currentEncryptionType);
                         }
-
+                        //Choose file
                         new FileChooser(currentEncryptionType, encrKey, users, fileHandler);
                     }
                 });
@@ -304,6 +312,16 @@ public class ChatPane extends JPanel {
                 if (confirm == 0) {
                     close();
                 }
+            }
+        });
+
+        keyRequest.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        keyRequestChooser.createGUI();
+                    }
+                });
             }
         });
     }
@@ -358,6 +376,14 @@ public class ChatPane extends JPanel {
      */
     public FileHandler getFileHandler() {
         return fileHandler;
+    }
+
+    /**
+     * Get the key request chooser
+     * @return the key request chooser
+     */
+    public KeyRequestChooser getKeyRequestChooser() {
+        return keyRequestChooser;
     }
 
     /**

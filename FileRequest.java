@@ -18,10 +18,6 @@ public class FileRequest extends Query {
     public FileRequest(String message, String fileName, String fileSize, String IP,
                        String port, String encryptionType, String encryptionKey) {
         super(message);
-
-        System.out.println("THIS IS IN FILEREQUEST");
-        System.out.println(fileName);
-        System.out.println(fileSize);
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.IP = IP;
