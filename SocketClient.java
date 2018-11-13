@@ -80,7 +80,7 @@ public class SocketClient implements Runnable {
         if(clientS.contains("localhost")){
             clientS = "localhost";
         }
-        
+
         return clientS;
     }
 
