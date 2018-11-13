@@ -183,12 +183,6 @@ public class Backend {
         }
         else if (query instanceof FileRequest) {
             FileRequest fileRequest = (FileRequest) query;
-            System.out.println(fileRequest.getFileName());
-            System.out.println(fileRequest.getFileSize());
-            System.out.println(fileRequest.getIP());
-            System.out.println(fileRequest.getPort());
-            System.out.println("FileRequest");
-
             ChatPane chatPane = chatMap.get(user);
             FileHandler fileHandler = chatPane.getFileHandler();
 
