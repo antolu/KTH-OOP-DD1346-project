@@ -102,13 +102,14 @@ public class Encrypter {
             String string = Transcriber.byteToString(toDecrypt);
             StringBuilder sb = new StringBuilder();
 
+            /* Actually shift encrypt */
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
-                if (Character.isUPPERCASE(c)) {
+                if (Character.isUpperCase(c)) {
                     int idx = (LOWERCASE.length + UPPERCASE_MAP.get(c) - secretKey) % LOWERCASE.length;
                     sb.append(UPPERCASE[idx]);
                 }
-                else if (Character.isLOWERCASE(c)) {
+                else if (Character.isLowerCase(c)) {
                     sb.append(LOWERCASE[(LOWERCASE.length + LOWERCASE_MAP.get(c) - secretKey) % LOWERCASE.length]);
                 }
                 else {
@@ -170,15 +171,17 @@ public class Encrypter {
         try {
             int secretKey = Integer.parseInt(key);
             String string = Transcriber.byteToString(toEncrypt);
+
             StringBuilder sb = new StringBuilder();
 
+            /* Actually decrypt */
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
-                if (Character.isUPPERCASE(c)) { 
+                if (Character.isUpperCase(c)) { 
                     int idx = (LOWERCASE.length + UPPERCASE_MAP.get(c) + secretKey) % LOWERCASE.length;
                     sb.append(UPPERCASE[idx]);
                 }
-                else if (Character.isLOWERCASE(c)) {
+                else if (Character.isLowerCase(c)) {
                     sb.append(LOWERCASE[(LOWERCASE.length + LOWERCASE_MAP.get(c) + secretKey) % LOWERCASE.length]);
                 }
                 else {
@@ -209,11 +212,15 @@ public class Encrypter {
      * @return An encrypted byte array
      */
     private static byte[] encryptAES(String key, byte[] toEncrypt) throws Exception {
+        /* First decode the key from Base64 */
         byte[] decodedKey = Base64.getDecoder().decode(key);
+
+        /* Retrieve the AES key from byte form */
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
         Cipher cipher = Cipher.getInstance("AES");
 
+        /* Return Base64 encoded string */
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
         return Base64.getEncoder().encode(cipher.doFinal(toEncrypt));
     }
