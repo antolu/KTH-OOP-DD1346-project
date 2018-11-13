@@ -220,7 +220,7 @@ public class Backend {
 
             /* If multipart chat is active, remove user from it */
             if (multiPartPane != null) {
-                multiPartPane.addMessage(new Message(user.getName() + " disconnected."));
+                // multiPartPane.addMessage(new Message(user.getName() + " disconnected."));
                 multiPartPane.removeUser(user);
             }
         }
