@@ -103,12 +103,9 @@ public class Encrypter {
         byte[] decodedKey = Base64.getDecoder().decode(key);
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance("AES");
 
-        byte[] ivByte = new byte[cipher.getBlockSize()];
-        IvParameterSpec ivParamsSpec = new IvParameterSpec(ivByte);
-
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParamsSpec);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
         return cipher.doFinal(decodedBytes);
     }
 
@@ -149,12 +146,10 @@ public class Encrypter {
         byte[] decodedKey = Base64.getDecoder().decode(key);
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        byte[] ivByte = new byte[cipher.getBlockSize()];
-        IvParameterSpec ivParamsSpec = new IvParameterSpec(ivByte);
+        Cipher cipher = Cipher.getInstance("AES");
 
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParamsSpec);
-        return cipher.doFinal(toEncrypt);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        return Base64.getEncoder().encode(cipher.doFinal(toEncrypt));
     }
 
     private static byte[] encryptRSA(String key, byte[] toEncrypt) {
