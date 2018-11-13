@@ -19,25 +19,46 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-
+/**
+ *  Class where user chooses file to send
+ */
 public class FileChooser{
 
+    /**
+     *
+     * @param currentEncryption the type of encryption used
+     * @param encrKey the encryption key
+     * @param users list of the users
+     * @param fileHandler the filehandler that will transfer the file etc
+     */
     public FileChooser(String currentEncryption, String encrKey, List<User> users, FileHandler fileHandler){
 
+        //Create file chooser
         final JFileChooser jfc = new JFileChooser();
         int returnValue = jfc.showOpenDialog(null);
 
-        JFrame messageFrame = new JFrame();
-        JTextField sendMessageText = new JTextField();
-        sendMessageText.setPreferredSize(new Dimension(200,40));
-        JLabel messageLabel = new JLabel("Write a message to accompany the file");
-        JButton sendMessageB = new JButton("Send");
-
+        //Wait for a file to be selected
         if(returnValue == JFileChooser.APPROVE_OPTION){
 
             File selectedFile;
             selectedFile = jfc.getSelectedFile();
 
+            //Create message-input frame
+            JFrame messageFrame = new JFrame();
+            JTextField sendMessageText = new JTextField();
+            sendMessageText.setPreferredSize(new Dimension(200,40));
+            JLabel messageLabel = new JLabel("Write a message to accompany the file");
+            JButton sendMessageB = new JButton("Send");
+
+            messageFrame.add(sendMessageText);
+            messageFrame.add(messageLabel);
+            messageFrame.add(sendMessageB);
+
+            messageFrame.setLayout(new FlowLayout());
+            messageFrame.setSize(300,200);
+            messageFrame.setVisible(true);
+
+            //Add action listener to the send-button
             sendMessageB.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e){
 
@@ -49,6 +70,7 @@ public class FileChooser{
 
                     Random randNumbr = new Random();
 
+                    //Create a socket with random port number for the outgoing file-request
                     while(!foundPort){
                         portNumber = randNumbr.nextInt((max-min)+1)+min;
 
@@ -63,18 +85,11 @@ public class FileChooser{
 
                     messageFrame.dispose();
 
+                    //Call method where the file is sent
                     fileHandler.sendFileRequest(fileSocket, users.get(0).getClientSocket(), sendMessageText.getText(),
                             portNumber, selectedFile, currentEncryption, encrKey);
                 }
             });
-
-            messageFrame.add(sendMessageText);
-            messageFrame.add(messageLabel);
-            messageFrame.add(sendMessageB);
-
-            messageFrame.setLayout(new FlowLayout());
-            messageFrame.setSize(300,200);
-            messageFrame.setVisible(true);
         }
     }
 }
