@@ -225,15 +225,13 @@ public class Transcriber {
      * @return A FileRequest object with all available information encapsulated.
      */
     private static FileRequest parseFileRequest(Element rootElement, SocketClient socket) {
-        System.out.println("Transcriber");
+
         String textMessage = unescapeHtml4(rootElement.getTextContent());
         String filesize = rootElement.getAttribute("filesize");
         String filename = rootElement.getAttribute("filename");
         String port = rootElement.getAttribute("port");
         String encryptionType = rootElement.getAttribute("type");
         String encryptionKey = rootElement.getAttribute("key");
-        System.out.println(filename);
-        System.out.println(filesize);
 
         return new FileRequest(textMessage, filename, filesize, socket.getSocketID(), port, encryptionType, encryptionKey);
         // Handle the file request, <filerequest name="" size="" type="" key=""></filerequest>
