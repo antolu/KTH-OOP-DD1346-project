@@ -15,11 +15,11 @@ public class Encrypter {
     public static final String[] SUPPORTED_ENCRYPTIONS = {"AES", "Caesar"};
     private static final char[] lowercase = {'a', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-        'v', 'w', 'x', 'y', 'z', 'a', 'a', 'o'};
+        'v', 'w', 'x', 'y', 'z'};
 
     private static final char[] uppercase = {'A', 'B', 'C', 'D', 'E', 'F', 'G',
         'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-        'V', 'W', 'X', 'Y', 'Z', 'A', 'A', 'O'};
+        'V', 'W', 'X', 'Y', 'Z'};
 
     private static final HashMap<Character, Integer> lowercaseMap = new HashMap<>();
     private static final HashMap<Character, Integer> uppercaseMap = new HashMap<>();
@@ -77,7 +77,8 @@ public class Encrypter {
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
                 if (Character.isUpperCase(c)) {
-                    sb.append(uppercase[(lowercase.length + uppercaseMap.get(c) - secretKey) % lowercase.length]);
+                    int idx = (lowercase.length + uppercaseMap.get(c) - secretKey) % lowercase.length;
+                    sb.append(uppercase[idx]);
                 }
                 else if (Character.isLowerCase(c)) {
                     sb.append(lowercase[(lowercase.length + lowercaseMap.get(c) - secretKey) % lowercase.length]);
@@ -121,11 +122,12 @@ public class Encrypter {
 
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
-                if (Character.isUpperCase(c)) {
-                    sb.append(uppercase[(uppercaseMap.get(c) + secretKey) % lowercase.length]);
+                if (Character.isUpperCase(c)) { 
+                    int idx = (lowercase.length + uppercaseMap.get(c) + secretKey) % lowercase.length;
+                    sb.append(uppercase[idx]);
                 }
                 else if (Character.isLowerCase(c)) {
-                    sb.append(lowercase[(lowercaseMap.get(c) + secretKey) % lowercase.length]);
+                    sb.append(lowercase[(lowercase.length + lowercaseMap.get(c) + secretKey) % lowercase.length]);
                 }
                 else {
                     sb.append(c);
