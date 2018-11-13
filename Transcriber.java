@@ -39,15 +39,7 @@ public class Transcriber {
      * @return The converted string.
      */
     public static String byteToString(byte[] bytes) {
-        // try {
-        //     return new String(bytes, "UTF-8");
-        // } catch (Exception e)
-        // {
-        //     return "";
-        // }
         return new String(bytes, StandardCharsets.UTF_8);
-        // return Base64.getEncoder().encodeToString(bytes);
-        // return Base64.encodeBase64String(bytes);
     }
 
     /**
@@ -56,13 +48,7 @@ public class Transcriber {
      * @return The converted byte array.
      */
     public static byte[] stringToByte(String string) {
-        // try {
-        //     return string.getBytes("UTF-8");
-        // } catch (Exception e) {
-        //     return null;
-        // }
         return string.getBytes(StandardCharsets.UTF_8);
-        // return Base64.getDecoder().decode(string);
     }
 
     /**
@@ -71,6 +57,9 @@ public class Transcriber {
      * @return The converted string.
      */
     public static String byteToHex(byte[] bytes) {
+        System.err.println("Original byte array: " + bytes);
+        System.err.println("Byte array converted to hex: " + DatatypeConverter.printHexBinary(bytes));
+        System.err.println("Byte array as string: " + byteToString(bytes));
         return DatatypeConverter.printHexBinary(bytes);
     }
 
@@ -80,6 +69,9 @@ public class Transcriber {
      * @return The converted byte array.
      */
     public static byte[] hexToByte(String hex) {
+        System.err.println("Original hex: " + hex);
+        System.err.println("Hex converted to byte array: " + DatatypeConverter.parseHexBinary(hex));
+        System.err.println("Hex as byte array: " + stringToByte(hex));
         return DatatypeConverter.parseHexBinary(hex);
     }
     
