@@ -140,15 +140,22 @@ public class Encrypter {
      * @return A decrypted byte array
      */
     private static byte[] decryptAES(String key, byte[] toDecrypt) throws Exception {
-        byte[] decodedBytes = Base64.getDecoder().decode(toDecrypt);
+        try {
+            /* First decode the byte array from Base&¤ */
+            byte[] decodedBytes = Base64.getDecoder().decode(toDecrypt);
 
-        byte[] decodedKey = Base64.getDecoder().decode(key);
-        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
+            /* Decode key from Base64 */
+            byte[] decodedKey = Base64.getDecoder().decode(key);
+            SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
-        Cipher cipher = Cipher.getInstance("AES");
+            Cipher cipher = Cipher.getInstance("AES");
 
-        cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        return cipher.doFinal(decodedBytes);
+            /* Actually decrypt */
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            return cipher.doFinal(decodedBytes);
+        } catch (Exception e) {
+            return toDecrypt;
+        }
     }
 
     /**
@@ -212,17 +219,21 @@ public class Encrypter {
      * @return An encrypted byte array
      */
     private static byte[] encryptAES(String key, byte[] toEncrypt) throws Exception {
-        /* First decode the key from Base64 */
-        byte[] decodedKey = Base64.getDecoder().decode(key);
+        try{
+            /* First decode the key from Base64 */
+            byte[] decodedKey = Base64.getDecoder().decode(key);
 
-        /* Retrieve the AES key from byte form */
-        SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
+            /* Retrieve the AES key from byte form */
+            SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
-        Cipher cipher = Cipher.getInstance("AES");
+            Cipher cipher = Cipher.getInstance("AES");
 
-        /* Return Base64 encoded string */
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        return Base64.getEncoder().encode(cipher.doFinal(toEncrypt));
+            /* Return Base64 encoded string */
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            return Base64.getEncoder().encode(cipher.doFinal(toEncrypt));
+        } catch (Exception e) {
+            return toEncrypt;
+        }
     }
 
     /**
