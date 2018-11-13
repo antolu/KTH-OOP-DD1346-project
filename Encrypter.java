@@ -11,27 +11,40 @@ import java.lang.Character;
 
 import java.util.HashMap;
 
+/**
+ * Static methods to do all encryptions
+ */
 public class Encrypter {
     public static final String[] SUPPORTED_ENCRYPTIONS = {"AES", "Caesar"};
-    private static final char[] lowercase = {'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    private static final char[] LOWERCASE = {'a', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
-        'v', 'w', 'x', 'y', 'z', 'a', 'a', 'o'};
+        'v', 'w', 'x', 'y', 'z'};
 
-    private static final char[] uppercase = {'A', 'B', 'C', 'D', 'E', 'F', 'G',
+    private static final char[] UPPERCASE = {'A', 'B', 'C', 'D', 'E', 'F', 'G',
         'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-        'V', 'W', 'X', 'Y', 'Z', 'A', 'A', 'O'};
+        'V', 'W', 'X', 'Y', 'Z'};
 
-    private static final HashMap<Character, Integer> lowercaseMap = new HashMap<>();
-    private static final HashMap<Character, Integer> uppercaseMap = new HashMap<>();
+    private static final HashMap<Character, Integer> LOWERCASE_MAP = new HashMap<>();
+    private static final HashMap<Character, Integer> UPPERCASE_MAP = new HashMap<>();
 
+    /**
+     * Initializes the dictionaries recuired for Caesar encryption to function
+     */
     public static void initialize() {
-
-        for (int i = 0; i < lowercase.length; i++) {
-            lowercaseMap.put(lowercase[i], i);
-            uppercaseMap.put(uppercase[i], i);
+        for (int i = 0; i < LOWERCASE.length; i++) {
+            LOWERCASE_MAP.put(LOWERCASE[i], i);
+            UPPERCASE_MAP.put(UPPERCASE[i], i);
         }
     }
 
+    /**
+     * Public method to handle all encryptions. Returns an encrypted byte array
+     * if the encryption type is supported.
+     * @param type The encryption type
+     * @param key The encryption key
+     * @param toEncrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     public static byte[] encrypt(String type, String key, byte[] toEncrypt) {
         try {
             if (type.equals("caesar"))
@@ -50,6 +63,14 @@ public class Encrypter {
         }
     }
 
+    /**
+     * Public method to handle all decryptions. Returns a decrypted byte array
+     * if the encryption type is supported.
+     * @param type The encryption type
+     * @param key The encryption key
+     * @param toEncrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     public static byte[] decrypt(String type, String key, byte[] toDecrypt) {
         try {
             if (type.equals("caesar"))
@@ -68,19 +89,28 @@ public class Encrypter {
         }
     }
     
+    /**
+     * Decrypts caesar encoded byte array by first converting it to
+     * string, decrypting, and lastly returning it as a byte array.
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptCaesar(String key, byte[] toDecrypt) {
         try {
             int secretKey = Integer.parseInt(key);
             String string = Transcriber.byteToString(toDecrypt);
             StringBuilder sb = new StringBuilder();
 
+            /* Actually shift encrypt */
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
                 if (Character.isUpperCase(c)) {
-                    sb.append(uppercase[(uppercaseMap.get(c) - secretKey) % lowercase.length]);
+                    int idx = (LOWERCASE.length + UPPERCASE_MAP.get(c) - secretKey) % LOWERCASE.length;
+                    sb.append(UPPERCASE[idx]);
                 }
                 else if (Character.isLowerCase(c)) {
-                    sb.append(lowercase[(lowercaseMap.get(c) - secretKey) % lowercase.length]);
+                    sb.append(LOWERCASE[(LOWERCASE.length + LOWERCASE_MAP.get(c) - secretKey) % LOWERCASE.length]);
                 }
                 else {
                     sb.append(c);
@@ -93,42 +123,66 @@ public class Encrypter {
         }
     }
 
+    /**
+     * Decrypts Blowfish encoded byte array
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptBlowfish(String key, byte[] toDecrypt) {
         return toDecrypt;
     }
 
+    /**
+     * Decrypts AES encoded byte array
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptAES(String key, byte[] toDecrypt) throws Exception {
         byte[] decodedBytes = Base64.getDecoder().decode(toDecrypt);
 
         byte[] decodedKey = Base64.getDecoder().decode(key);
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        Cipher cipher = Cipher.getInstance("AES");
 
-        byte[] ivByte = new byte[cipher.getBlockSize()];
-        IvParameterSpec ivParamsSpec = new IvParameterSpec(ivByte);
-
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivParamsSpec);
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
         return cipher.doFinal(decodedBytes);
     }
 
+    /**
+     * Decrypts RSA encoded byte array
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptRSA(String key, byte[] toDecrypt) {
         return toDecrypt;
     }
 
+    /**
+     * Encrypts byte array with Caesar
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptCaesar(String key, byte[] toEncrypt) {
         try {
             int secretKey = Integer.parseInt(key);
             String string = Transcriber.byteToString(toEncrypt);
+
             StringBuilder sb = new StringBuilder();
 
+            /* Actually decrypt */
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
-                if (Character.isUpperCase(c)) {
-                    sb.append(uppercase[(uppercaseMap.get(c) + secretKey) % lowercase.length]);
+                if (Character.isUpperCase(c)) { 
+                    int idx = (LOWERCASE.length + UPPERCASE_MAP.get(c) + secretKey) % LOWERCASE.length;
+                    sb.append(UPPERCASE[idx]);
                 }
                 else if (Character.isLowerCase(c)) {
-                    sb.append(lowercase[(lowercaseMap.get(c) + secretKey) % lowercase.length]);
+                    sb.append(LOWERCASE[(LOWERCASE.length + LOWERCASE_MAP.get(c) + secretKey) % LOWERCASE.length]);
                 }
                 else {
                     sb.append(c);
@@ -141,22 +195,42 @@ public class Encrypter {
         }
     }
 
+    /**
+     * Encrypts byte array with Blowfish
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptBlowfish(String key, byte[] toEncrypt) {
         return toEncrypt;
     }
 
+    /**
+     * Encrypts byte array with AES
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptAES(String key, byte[] toEncrypt) throws Exception {
+        /* First decode the key from Base64 */
         byte[] decodedKey = Base64.getDecoder().decode(key);
+
+        /* Retrieve the AES key from byte form */
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
 
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        byte[] ivByte = new byte[cipher.getBlockSize()];
-        IvParameterSpec ivParamsSpec = new IvParameterSpec(ivByte);
+        Cipher cipher = Cipher.getInstance("AES");
 
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParamsSpec);
-        return cipher.doFinal(toEncrypt);
+        /* Return Base64 encoded string */
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        return Base64.getEncoder().encode(cipher.doFinal(toEncrypt));
     }
 
+    /**
+     * Encrypts byte array with RSA
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptRSA(String key, byte[] toEncrypt) {
         return toEncrypt;
     }

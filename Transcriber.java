@@ -39,15 +39,7 @@ public class Transcriber {
      * @return The converted string.
      */
     public static String byteToString(byte[] bytes) {
-        // try {
-        //     return new String(bytes, "UTF-8");
-        // } catch (Exception e)
-        // {
-        //     return "";
-        // }
         return new String(bytes, StandardCharsets.UTF_8);
-        // return Base64.getEncoder().encodeToString(bytes);
-        // return Base64.encodeBase64String(bytes);
     }
 
     /**
@@ -56,13 +48,7 @@ public class Transcriber {
      * @return The converted byte array.
      */
     public static byte[] stringToByte(String string) {
-        // try {
-        //     return string.getBytes("UTF-8");
-        // } catch (Exception e) {
-        //     return null;
-        // }
         return string.getBytes(StandardCharsets.UTF_8);
-        // return Base64.getDecoder().decode(string);
     }
 
     /**
@@ -71,6 +57,9 @@ public class Transcriber {
      * @return The converted string.
      */
     public static String byteToHex(byte[] bytes) {
+        System.err.println("Original byte array: " + bytes);
+        System.err.println("Byte array converted to hex: " + DatatypeConverter.printHexBinary(bytes));
+        System.err.println("Byte array as string: " + byteToString(bytes));
         return DatatypeConverter.printHexBinary(bytes);
     }
 
@@ -80,6 +69,9 @@ public class Transcriber {
      * @return The converted byte array.
      */
     public static byte[] hexToByte(String hex) {
+        System.err.println("Original hex: " + hex);
+        System.err.println("Hex converted to byte array: " + DatatypeConverter.parseHexBinary(hex));
+        System.err.println("Hex as byte array: " + stringToByte(hex));
         return DatatypeConverter.parseHexBinary(hex);
     }
     
@@ -144,10 +136,23 @@ public class Transcriber {
         if (text.getElementsByTagName("encrypted").item(0) != null) {
             NodeList childNodes = text.getChildNodes();
 
+            /* Parse the text content and watch for partially
+            encrypted messages */
+            Element node;
             for (int i = 0; i < childNodes.getLength(); i++) {
-                Element node = (Element) childNodes.item(i);
+                /* If child node is new XML tag, else only text */
+                if(childNodes.item(i).getNodeType() == Node.ELEMENT_NODE){
+                    node = (Element) childNodes.item(i);
+                }
+                else {
+                    textMessage += childNodes.item(i).getNodeValue();
+                    continue;
+                }
+
+                /* Decrypt part of */
                 String encryptionType = node.getAttribute("type");
                 String encryptionKey = node.getAttribute("key");
+                String encryptedMsg = node.getNodeValue();
                 textMessage += byteToString(Encrypter.decrypt(encryptionType, encryptionKey, hexToByte(node.getTextContent())));
             }
         }
