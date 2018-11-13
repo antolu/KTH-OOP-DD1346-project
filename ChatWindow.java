@@ -109,7 +109,7 @@ public class ChatWindow extends JEditorPane {
      * @param msg The message to be added.
      */
     public void addMessage(Message msg) {
-        if (msg.getUsername().equals("")) 
+        if (msg.getUsername() == null) 
             addTableElement(name + "\n" + msg.getTime(), msg.getMessage(), "", msg.getColor());
         else
             addTableElement(msg.getUsername() + "\n" + msg.getTime(), msg.getMessage(), "", msg.getColor());
