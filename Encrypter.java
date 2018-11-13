@@ -11,27 +11,40 @@ import java.lang.Character;
 
 import java.util.HashMap;
 
+/**
+ * Static methods to do all encryptions
+ */
 public class Encrypter {
     public static final String[] SUPPORTED_ENCRYPTIONS = {"AES", "Caesar"};
-    private static final char[] lowercase = {'a', 'b', 'c', 'd', 'e', 'f', 'g',
+    private static final char[] LOWERCASE = {'a', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
         'v', 'w', 'x', 'y', 'z'};
 
-    private static final char[] uppercase = {'A', 'B', 'C', 'D', 'E', 'F', 'G',
+    private static final char[] UPPERCASE = {'A', 'B', 'C', 'D', 'E', 'F', 'G',
         'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
         'V', 'W', 'X', 'Y', 'Z'};
 
-    private static final HashMap<Character, Integer> lowercaseMap = new HashMap<>();
-    private static final HashMap<Character, Integer> uppercaseMap = new HashMap<>();
+    private static final HashMap<Character, Integer> LOWERCASE_MAP = new HashMap<>();
+    private static final HashMap<Character, Integer> UPPERCASE_MAP = new HashMap<>();
 
+    /**
+     * Initializes the dictionaries recuired for Caesar encryption to function
+     */
     public static void initialize() {
-
-        for (int i = 0; i < lowercase.length; i++) {
-            lowercaseMap.put(lowercase[i], i);
-            uppercaseMap.put(uppercase[i], i);
+        for (int i = 0; i < LOWERCASE.length; i++) {
+            LOWERCASE_MAP.put(LOWERCASE[i], i);
+            UPPERCASE_MAP.put(UPPERCASE[i], i);
         }
     }
 
+    /**
+     * Public method to handle all encryptions. Returns an encrypted byte array
+     * if the encryption type is supported.
+     * @param type The encryption type
+     * @param key The encryption key
+     * @param toEncrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     public static byte[] encrypt(String type, String key, byte[] toEncrypt) {
         try {
             if (type.equals("caesar"))
@@ -50,6 +63,14 @@ public class Encrypter {
         }
     }
 
+    /**
+     * Public method to handle all decryptions. Returns a decrypted byte array
+     * if the encryption type is supported.
+     * @param type The encryption type
+     * @param key The encryption key
+     * @param toEncrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     public static byte[] decrypt(String type, String key, byte[] toDecrypt) {
         try {
             if (type.equals("caesar"))
@@ -68,6 +89,13 @@ public class Encrypter {
         }
     }
     
+    /**
+     * Decrypts caesar encoded byte array by first converting it to
+     * string, decrypting, and lastly returning it as a byte array.
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptCaesar(String key, byte[] toDecrypt) {
         try {
             int secretKey = Integer.parseInt(key);
@@ -76,12 +104,12 @@ public class Encrypter {
 
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
-                if (Character.isUpperCase(c)) {
-                    int idx = (lowercase.length + uppercaseMap.get(c) - secretKey) % lowercase.length;
-                    sb.append(uppercase[idx]);
+                if (Character.isUPPERCASE(c)) {
+                    int idx = (LOWERCASE.length + UPPERCASE_MAP.get(c) - secretKey) % LOWERCASE.length;
+                    sb.append(UPPERCASE[idx]);
                 }
-                else if (Character.isLowerCase(c)) {
-                    sb.append(lowercase[(lowercase.length + lowercaseMap.get(c) - secretKey) % lowercase.length]);
+                else if (Character.isLOWERCASE(c)) {
+                    sb.append(LOWERCASE[(LOWERCASE.length + LOWERCASE_MAP.get(c) - secretKey) % LOWERCASE.length]);
                 }
                 else {
                     sb.append(c);
@@ -94,10 +122,22 @@ public class Encrypter {
         }
     }
 
+    /**
+     * Decrypts Blowfish encoded byte array
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptBlowfish(String key, byte[] toDecrypt) {
         return toDecrypt;
     }
 
+    /**
+     * Decrypts AES encoded byte array
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptAES(String key, byte[] toDecrypt) throws Exception {
         byte[] decodedBytes = Base64.getDecoder().decode(toDecrypt);
 
@@ -110,10 +150,22 @@ public class Encrypter {
         return cipher.doFinal(decodedBytes);
     }
 
+    /**
+     * Decrypts RSA encoded byte array
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be decrypted
+     * @return A decrypted byte array
+     */
     private static byte[] decryptRSA(String key, byte[] toDecrypt) {
         return toDecrypt;
     }
 
+    /**
+     * Encrypts byte array with Caesar
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptCaesar(String key, byte[] toEncrypt) {
         try {
             int secretKey = Integer.parseInt(key);
@@ -122,12 +174,12 @@ public class Encrypter {
 
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
-                if (Character.isUpperCase(c)) { 
-                    int idx = (lowercase.length + uppercaseMap.get(c) + secretKey) % lowercase.length;
-                    sb.append(uppercase[idx]);
+                if (Character.isUPPERCASE(c)) { 
+                    int idx = (LOWERCASE.length + UPPERCASE_MAP.get(c) + secretKey) % LOWERCASE.length;
+                    sb.append(UPPERCASE[idx]);
                 }
-                else if (Character.isLowerCase(c)) {
-                    sb.append(lowercase[(lowercase.length + lowercaseMap.get(c) + secretKey) % lowercase.length]);
+                else if (Character.isLOWERCASE(c)) {
+                    sb.append(LOWERCASE[(LOWERCASE.length + LOWERCASE_MAP.get(c) + secretKey) % LOWERCASE.length]);
                 }
                 else {
                     sb.append(c);
@@ -140,10 +192,22 @@ public class Encrypter {
         }
     }
 
+    /**
+     * Encrypts byte array with Blowfish
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptBlowfish(String key, byte[] toEncrypt) {
         return toEncrypt;
     }
 
+    /**
+     * Encrypts byte array with AES
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptAES(String key, byte[] toEncrypt) throws Exception {
         byte[] decodedKey = Base64.getDecoder().decode(key);
         SecretKey secretKey = new SecretKeySpec(decodedKey, 0, decodedKey.length, "AES"); 
@@ -154,6 +218,12 @@ public class Encrypter {
         return Base64.getEncoder().encode(cipher.doFinal(toEncrypt));
     }
 
+    /**
+     * Encrypts byte array with RSA
+     * @param key The encryption key
+     * @param toDecrypt The byte array to be encrypted
+     * @return An encrypted byte array
+     */
     private static byte[] encryptRSA(String key, byte[] toEncrypt) {
         return toEncrypt;
     }
