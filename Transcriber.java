@@ -136,8 +136,11 @@ public class Transcriber {
         if (text.getElementsByTagName("encrypted").item(0) != null) {
             NodeList childNodes = text.getChildNodes();
 
+            /* Parse the text content and watch for partially
+            encrypted messages */
             Element node;
             for (int i = 0; i < childNodes.getLength(); i++) {
+                /* If child node is new XML tag, else only text */
                 if(childNodes.item(i).getNodeType() == Node.ELEMENT_NODE){
                     node = (Element) childNodes.item(i);
                 }
@@ -145,6 +148,8 @@ public class Transcriber {
                     textMessage += childNodes.item(i).getNodeValue();
                     continue;
                 }
+
+                /* Decrypt part of */
                 String encryptionType = node.getAttribute("type");
                 String encryptionKey = node.getAttribute("key");
                 String encryptedMsg = node.getNodeValue();
