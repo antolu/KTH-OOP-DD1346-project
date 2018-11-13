@@ -136,10 +136,18 @@ public class Transcriber {
         if (text.getElementsByTagName("encrypted").item(0) != null) {
             NodeList childNodes = text.getChildNodes();
 
+            Element node;
             for (int i = 0; i < childNodes.getLength(); i++) {
-                Element node = (Element) childNodes.item(i);
+                if(childNodes.item(i).getNodeType() == Node.ELEMENT_NODE){
+                    node = (Element) childNodes.item(i);
+                }
+                else {
+                    textMessage += childNodes.item(i).getNodeValue();
+                    continue;
+                }
                 String encryptionType = node.getAttribute("type");
                 String encryptionKey = node.getAttribute("key");
+                String encryptedMsg = node.getNodeValue();
                 textMessage += byteToString(Encrypter.decrypt(encryptionType, encryptionKey, hexToByte(node.getTextContent())));
             }
         }
