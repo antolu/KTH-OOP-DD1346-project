@@ -212,6 +212,14 @@ public class Backend {
                 return; // No suuuport for the key type
             user.getClientSocket().send(Composer.composeKeyRequestResponse(key));
         }
+        else if (query instanceof KeyRequestResponse){
+            KeyRequestResponse keyRequestResponse = (KeyRequestResponse) query;
+            ChatPane chatPane = chatMap.get(user);
+            KeyRequestChooser keyRequestChooser = chatPane.getKeyRequestChooser();
+            keyRequestChooser.setRunningStatus(false);
+            keyRequestChooser.answerReceived();
+
+        }
         else if (query.getMessage().equals("<disconnect />")) {
             ChatPane chatPane = chatMap.get(user);
             chatPane.addMessage(new Message(user.getName() + " disconnected.", "", "", ""));
