@@ -53,8 +53,6 @@ public class Backend {
     private String myName;
     private int port;
 
-    private ChatPane chatPane;
-
     private ChatPane multiPartPane = null;
 
     /**
@@ -512,7 +510,7 @@ public class Backend {
     /**
      * Closes the server socket
      */
-    public void disconnectServerSocket() {
+    private void disconnectServerSocket() {
         try {
             serverSocket.close();
         }

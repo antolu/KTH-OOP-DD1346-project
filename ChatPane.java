@@ -59,8 +59,6 @@ public class ChatPane extends JPanel {
 
     /** The current color all msesages are sent with */
     private volatile String currentColor = "000000";
-    /** If this JPanel is visible in the GUI currently or not. */
-    private Boolean isVisible;
     /** The current global enryption type */
     private String currentEncryptionType = "";
     /** Contains all the keys, each key corresponding to a type. <type,key>  */
