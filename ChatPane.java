@@ -448,6 +448,7 @@ public class ChatPane extends JPanel {
         disconnectButton.setEnabled(false);
         setColorButton.setEnabled(false);
         msgField.setEditable(false);
+        keyRequest.setEnabled(false);
     }
 
     /**
