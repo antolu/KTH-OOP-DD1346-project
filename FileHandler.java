@@ -65,6 +65,11 @@ public class FileHandler{
         String filename = fileRequest.getFileName();
         String fileSender = user.getName();
         String requestMessage = fileRequest.getMessage();
+
+        final String encryptionType = fileRequest.getEncryptionType();
+        final String encryptionKey=fileRequest.getEncryptionKey();
+        boolean isEncrypted = fileRequest.isEncrypted();
+
        /* if(host.contains("localhost")){
             host="localhost";
         }*/
@@ -185,6 +190,10 @@ public class FileHandler{
                                         }
                                     }
                                 });
+
+                                if(isEncrypted){
+                                    bytes = Encrypter.decrypt(encryptionType, encryptionKey, bytes);
+                                }
 
                                 //Write to file
                                 out.write(bytes, 0, count);
@@ -408,6 +417,10 @@ public class FileHandler{
 
                     totalSent = totalSent+count;
                     percentageSent = totalSent / length * 100.0;
+
+                    if(!encr.equals("")){
+                        bytes = Encrypter.encrypt(encr, key, bytes);
+                    }
 
                     //Update progress bar
                     progressBar.setValue((int)percentageSent);
