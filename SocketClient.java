@@ -111,10 +111,23 @@ public class SocketClient implements Runnable {
     public void run() {
         String message;
         Query parsedMessage;
+        int timeout = 100;
 
         while (!clientSocket.isClosed()) {
             message = receive();
             System.err.println("Received message " + message);
+
+            /* If other end leaves with out <disconnect /> */
+            if (message.equals("")) {
+                timeout--;
+                if (timeout < 0) {
+                    System.err.println("User at " + getSocketID() + "timed out.");
+                    close();
+                    return;
+                }
+            }
+            else 
+                timeout = 100;
 
             /* Do not parse empty messages */
             if (message.equals("") || message == null)
