@@ -105,6 +105,9 @@ public class Transcriber {
                 /* If message starts with <message><filereponse...> */
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
                     return parseFileResponse((Element) message.getChildNodes().item(0));
+                /* If message starts with <message><keyrequest> */
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("keyrequest"))
+                    return parseKeyRequest((Element) message.getChildNodes().item(0));
                 /* If message starts with <message><fileresponse ...> */
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("disconnect"))
                     return new Query("<disconnect />");
@@ -117,10 +120,6 @@ public class Transcriber {
                     return parseRequestResponse(message);
                 }
                 return parseRequest(message);
-            }
-            /* If message starts with <keyrequest> */
-            else if (message.getTagName() == "keyrequest") {
-                return parseKeyRequest(message);
             }
             return new Message(ERROR_MSG);
         } catch(Exception e) {
