@@ -42,7 +42,7 @@ public class FileHandler{
      * @param message, the accompaning message
      * @param reply, yes/no (accept/decline the file request
      */
-    private static void SendResponse(String message, String reply) {
+    private void SendResponse(String message, String reply) {
 
         String responseMessage = Composer.composeFileResponse(message,reply);
         socketClient.send(responseMessage);
@@ -53,7 +53,7 @@ public class FileHandler{
      * @param filerequest, containing optional accompanning message, file size and file name
      * @param socket, from  which socket the message came from
      */
-    public static void ShowFileRequest(FileRequest fileRequest, SocketClient messageSocket) {
+    public void ShowFileRequest(FileRequest fileRequest, SocketClient messageSocket) {
 
         isRunning = true;
         socketClient = messageSocket;
