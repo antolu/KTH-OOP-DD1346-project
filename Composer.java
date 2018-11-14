@@ -269,8 +269,4 @@ public class Composer {
 
         return sb.toString();
     }
-
-    public static String getDisconnectMessage() {
-        return "<message><disconnect /></message>";
-    }
 }
