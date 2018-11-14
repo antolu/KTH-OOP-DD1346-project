@@ -91,25 +91,34 @@ public class Transcriber {
             Document doc = dBuilder.parse(inputStream);
 
             Element message = doc.getDocumentElement();
+            /* If message starts with <message> */
             if (message.getTagName() == "message") {
-                if (message.getAttribute("multipart").equals("start"))
-                    return new Query("<multipartstart />");
-                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
-                    return parseFileRequest((Element) message.getChildNodes().item(0), socket);
-                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
-                    return parseFileResponse((Element) message.getChildNodes().item(0));
-                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("disconnect"))
-                    return new Query("<disconnect />");
+                /* If message starts with <message><text ...> */
+                if (((Element) message.getChildNodes().item(0)).getTagName().equals("text"))
+                    return parseMessage(doc, message);
+                /* If message starts with <message multipart=start> */
                 else if (message.getAttribute("multipart").equals("start"))
                     return new Query("<multipartstart />");
-                return parseMessage(doc, message);
+                /* If message starts with <message><filerequest ...> */
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
+                    return parseFileRequest((Element) message.getChildNodes().item(0), socket);
+                /* If message starts with <message><filereponse...> */
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("fileresponse"))
+                    return parseFileResponse((Element) message.getChildNodes().item(0));
+                /* If message starts with <message><fileresponse ...> */
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("disconnect"))
+                    return new Query("<disconnect />");
+                else 
+                    return new Query(ERROR_MSG);
             }
+            /* If message starts with <request> */
             else if (message.getTagName() == "request") {
                 if (message.hasAttribute("reply")) {
                     return parseRequestResponse(message);
                 }
                 return parseRequest(message);
             }
+            /* If message starts with <keyrequest> */
             else if (message.getTagName() == "keyrequest") {
                 return parseKeyRequest(message);
             }
