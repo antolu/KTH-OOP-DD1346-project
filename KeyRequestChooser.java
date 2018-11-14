@@ -39,14 +39,6 @@ public class KeyRequestChooser extends JPanel implements ActionListener {
      */
     public KeyRequestChooser(User inUser) {
         user = inUser;
-    }
-
-    /**
-     * Creates the GUI from witch the request is sent
-     */
-    public void createGUI(){
-        running = false;
-        /* Set layout */
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(150, Encrypter.SUPPORTED_ENCRYPTIONS.length * 50 + 100));
 
@@ -87,6 +79,15 @@ public class KeyRequestChooser extends JPanel implements ActionListener {
 
         frame.add(this);
         frame.pack();
+
+    }
+
+    /**
+     * Creates the GUI from witch the request is sent
+     */
+    public void createGUI(){
+        running = false;
+        /* Set layout */
         frame.setVisible(true);
     }
 
@@ -110,7 +111,7 @@ public class KeyRequestChooser extends JPanel implements ActionListener {
                     type = button.getText();
                     sendMessage=messageField.getText();
 
-                    frame.dispose();
+                    frame.setVisible(false);
 
                     //Compose a key request and send
                     composedRequest=Composer.composeKeyRequest(sendMessage,type);
@@ -154,8 +155,8 @@ public class KeyRequestChooser extends JPanel implements ActionListener {
      * Set the running status of the thread in the action performed
      * @param setRunning boolean
      */
-    public void setRunningStatus(boolean setRunning){
-        running = setRunning;
+    public void setRunningStatus(boolean inRunning){
+        running = inRunning;
     }
 
     /**
@@ -164,5 +165,11 @@ public class KeyRequestChooser extends JPanel implements ActionListener {
      */
     public boolean getRunningStatus(){
         return running;
+    }
+
+    public void answerReceived(){
+        JFrame processed = new JFrame("Request processed");
+
+        JOptionPane.showMessageDialog(processed, "Key request response received");
     }
 }
