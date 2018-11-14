@@ -1,6 +1,6 @@
 import java.lang.StringBuilder;
 import java.lang.String;
-import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
+import static org.apache.commons.text.StringEscapeUtils.escapeXml11;
 
 /**
  * Convenience class with static methods to compose all required messages
@@ -24,7 +24,7 @@ public class Composer {
             sb.append("\"");
         }
         sb.append(">");
-        sb.append(escapeHtml4(message));
+        sb.append(escapeXml11(message));
         sb.append("</request>");
 
         return sb.toString();
@@ -89,11 +89,11 @@ public class Composer {
             sb.append(" key=\"");
             sb.append(encryptionKey);
             sb.append("\">");
-            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionKey, Transcriber.stringToByte(escapeHtml4(message)))));
+            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionKey, Transcriber.stringToByte(escapeXml11(message)))));
             sb.append("</encrypted>");
         }
         else {
-            sb.append(escapeHtml4(message));
+            sb.append(escapeXml11(message));
         }
         sb.append("</text>");
         sb.append("</message>");
@@ -144,11 +144,11 @@ public class Composer {
             sb.append(" key=\"");
             sb.append(encryptionKey);
             sb.append("\">");
-            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionKey, Transcriber.stringToByte(escapeHtml4(message)))));
+            sb.append(Transcriber.byteToHex(Encrypter.encrypt(encryptionType, encryptionKey, Transcriber.stringToByte(escapeXml11(message)))));
             sb.append("</encrypted>");
         }
         else {
-            sb.append(escapeHtml4(message));
+            sb.append(escapeXml11(message));
         }
         sb.append("</text>");
         sb.append("</message>");
@@ -196,7 +196,7 @@ public class Composer {
             sb.append("\"");
         }
         sb.append(">");
-        sb.append(escapeHtml4(message));
+        sb.append(escapeXml11(message));
         sb.append("</filerequest>");
         sb.append("</message>");
 
@@ -218,7 +218,7 @@ public class Composer {
         sb.append(reply);
         sb.append("\"");
         sb.append(">");
-        sb.append(escapeHtml4(message));
+        sb.append(escapeXml11(message));
         sb.append("</fileresponse>");
 
         sb.append("</message>");
@@ -241,7 +241,7 @@ public class Composer {
         sb.append(type);
         sb.append("\"");
         sb.append(">");
-        sb.append(escapeHtml4(message));
+        sb.append(escapeXml11(message));
         sb.append("</keyrequest>");
 
         sb.append("</message>");

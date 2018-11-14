@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.net.InetSocketAddress;
 
 import java.util.Base64;
-import static org.apache.commons.text.StringEscapeUtils.unescapeHtml4;
+import static org.apache.commons.text.StringEscapeUtils.unescapeXml;
 
 import java.io.*;
 import javax.xml.transform.*;
@@ -81,7 +81,7 @@ public class Transcriber {
      * @return Message, the received message parsed
      */
     public static Query parse(String msg, SocketClient socket) {
-        // msg = unescapeHtml4(msg);
+        // msg = unescapeXml(msg);
         msg = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + msg;
         InputStream inputStream = new ByteArrayInputStream(msg.getBytes());
 
@@ -164,7 +164,7 @@ public class Transcriber {
         String color = text.getAttribute("color");
         String time = DTF.format(LocalDateTime.now());
 
-        Message msg = new Message(unescapeHtml4(textMessage), color, time, rootElement.getAttribute("name"));
+        Message msg = new Message(unescapeXml(textMessage), color, time, rootElement.getAttribute("name"));
 
         /* If is a multipart message, swap client/server attribute and
          * add to the message
@@ -194,7 +194,7 @@ public class Transcriber {
         String textMessage = rootElement.getTextContent();
         String name = rootElement.getAttribute("name");
 
-        return new Request(unescapeHtml4(textMessage), name);
+        return new Request(unescapeXml(textMessage), name);
     }
 
     /**
@@ -219,7 +219,7 @@ public class Transcriber {
         String textMessage = rootElement.getTextContent();
         String encryptionType = rootElement.getAttribute("type");
 
-        return new KeyRequest(unescapeHtml4(textMessage), encryptionType);
+        return new KeyRequest(unescapeXml(textMessage), encryptionType);
         // <keyrequest type="">Something</keyrequest>
     }
 
@@ -231,7 +231,7 @@ public class Transcriber {
      */
     private static FileRequest parseFileRequest(Element rootElement, SocketClient socket) {
 
-        String textMessage = unescapeHtml4(rootElement.getTextContent());
+        String textMessage = unescapeXml(rootElement.getTextContent());
         String filesize = rootElement.getAttribute("filesize");
         String filename = rootElement.getAttribute("filename");
         String port = rootElement.getAttribute("port");
@@ -248,7 +248,7 @@ public class Transcriber {
      * @return A FileResponse object with reply encapsulated.
      */
     private static FileResponse parseFileResponse(Element rootElement) {
-        String textMessage = unescapeHtml4(rootElement.getTextContent());
+        String textMessage = unescapeXml(rootElement.getTextContent());
         String reply = rootElement.getAttribute("reply");
 
         if (reply.equals("")) {
