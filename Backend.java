@@ -273,7 +273,7 @@ public class Backend {
         ChatPane newPane = new ChatPane(this, user, true);
 
         multipartMap.put(user, newPane);
-        tabbedPane.add("Multipart with" + user, newPane);
+        tabbedPane.add("Multipart with " + user, newPane);
     }
 
     /**
