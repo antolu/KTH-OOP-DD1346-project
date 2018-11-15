@@ -105,7 +105,7 @@ public class ChatWindow extends JEditorPane {
      * @param who Who the message corresponds to. Me or you.
      * @param msg The message to be added.
      */
-    public void addMessage(Message msg) {
+    public synchronized void addMessage(Message msg) {
         if (msg.getUsername() != null) 
             addTableElement(msg.getUsername() + "\n" + msg.getTime(), msg.getMessage(), "", msg.getColor());
         else
@@ -124,7 +124,7 @@ public class ChatWindow extends JEditorPane {
         refreshWindow();
     }
 
-    private void addTableElement(String left, String message, String right, String color) {
+    private synchronized void addTableElement(String left, String message, String right, String color) {
         Element tr = messagesPage.createElement("tr");
         Element leftCol = messagesPage.createElement("td");
         Element messageCol = messagesPage.createElement("td");
