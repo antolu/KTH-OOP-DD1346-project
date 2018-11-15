@@ -115,7 +115,6 @@ public class ChatPane extends JPanel {
 
         /* Disables certain buttons, prevents mistakes */
         disconnectButton.setEnabled(false);
-        closeButton.setEnabled(false);
         sendFileButton.setEnabled(false);
 
         /* Start multipart on all clients also */
