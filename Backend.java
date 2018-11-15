@@ -472,6 +472,10 @@ public class Backend {
         userList.remove(user);
         userListServer.remove(user);
 
+        /* De-register user */
+        userMap.remove(user.getClientSocket().getSocketID());
+        chatMap.remove(user);
+
         /* Send disconnect message to other user and close the socket */
         user.getClientSocket().send(Composer.DISCONNECT_MESSAGE);
         user.getClientSocket().close();
@@ -497,8 +501,6 @@ public class Backend {
      * @param user The user associated with the chat pane to be removed
      */
     public void close(ChatPane chatPane, User user) {
-        userMap.remove(user.getClientSocket().getSocketID());
-        chatMap.remove(user);
         tabbedPane.remove(chatPane);
     }
 
