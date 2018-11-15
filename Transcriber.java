@@ -108,6 +108,9 @@ public class Transcriber {
                 /* If message starts with <message><keyrequest> */
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("keyrequest"))
                     return parseKeyRequest((Element) message.getChildNodes().item(0));
+                /* If message starts with <message><keyresponse> */
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("keyresponse"))
+                    return parseKeyResponse((Element) message.getChildNodes().item(0));
                 /* If message starts with <message><fileresponse ...> */
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("disconnect"))
                     return new Query("<disconnect />");
@@ -229,6 +232,12 @@ public class Transcriber {
 
         return new KeyRequest(unescapeXml(textMessage), encryptionType);
         // <keyrequest type="">Something</keyrequest>
+    }
+
+    private static KeyRequestResponse parseKeyResponse(Element rootElement) {
+        String encryptionKey = rootElement.getAttribute("key");
+
+        return new KeyRequestResponse(encryptionKey);
     }
 
     /**
