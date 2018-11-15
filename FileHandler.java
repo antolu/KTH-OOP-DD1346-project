@@ -69,6 +69,7 @@ public class FileHandler{
         final String encryptionType = fileRequest.getEncryptionType();
         final String encryptionKey=fileRequest.getEncryptionKey();
         boolean isEncrypted = fileRequest.isEncrypted();
+        System.out.println("Encryption: "+encryptionType+" "+encryptionKey+" is encrypted: "+isEncrypted);
 
        /* if(host.contains("localhost")){
             host="localhost";
@@ -162,11 +163,13 @@ public class FileHandler{
                                 System.out.println("File not found. ");
                             }
 
+
                             byte[] bytes = new byte[1024];
                             double percentageReceived = 0;
                             int count;
                             double totalReceived = 0.0;
 
+                            byte[] bigBytes=new byte[0];
                             //Read in file
                             while ((count = in.read(bytes)) > 0) {
 
@@ -191,12 +194,18 @@ public class FileHandler{
                                     }
                                 });
 
-                                if(isEncrypted){
-                                    bytes = Encrypter.decrypt(encryptionType, encryptionKey, bytes);
-                                }
+                                bigBytes = concatenateByteArrays(bigBytes,bytes);
+                                System.out.println(bigBytes.length);
+                                System.out.println(count);
+                                System.out.println(totalReceived)
+                               // if(isEncrypted){
+                               //     bytes = Encrypter.decrypt(encryptionType, encryptionKey, bytes);
+                               // }
 
                                 //Write to file
-                                out.write(bytes, 0, count);
+                              //  System.out.println("Length: "+bytes.length+" Count: "+count);
+                            //    outStream.write(bytes, 0, bytes.length);
+                             //   System.out.println(totalReceived);
 
                                 try {
                                     Thread.sleep(50);
@@ -204,6 +213,22 @@ public class FileHandler{
                                     //do something
                                 }
                             }
+
+                           // byte[] result = outStream.toByteArray();
+                           // System.out.println(result.length);
+                           // byte[] outputBytes;
+                            if(isEncrypted){
+                                bigBytes = Encrypter.decrypt(encryptionType, encryptionKey, bigBytes);
+                                System.out.println(bigBytes.length);
+                                out.write(bigBytes);
+                                out.close();
+                            }
+                            else{
+                                out.write(bigBytes);
+                                out.close();
+                            }
+
+
 
                             //When done, dispose and close socket
                             SwingUtilities.invokeLater(new Runnable(){
@@ -243,6 +268,13 @@ public class FileHandler{
                 isRunning = false;
             }
         });
+    }
+
+    public byte[] concatenateByteArrays(byte[] a, byte[] b) {
+        byte[] result = new byte[a.length + b.length];
+        System.arraycopy(a, 0, result, 0, a.length);
+        System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
     }
 
     /**
@@ -361,7 +393,13 @@ public class FileHandler{
 
         String reply = fileResponse.getReply();
         String responseMessage = fileResponse.getMessage();
+        System.out.println(encr);
+        //Check if process is still happening
 
+        if(!getRunningStatus()){
+            System.out.println("running status");
+            return;
+        }
         //Send file
         if(reply.equals("Yes")) {
 
@@ -390,7 +428,7 @@ public class FileHandler{
 
             // Get the size of the file
             long length = file.length();
-            byte[] bytes = new byte[1024];
+            byte[] bytes = new byte[(int)length];
 
             try {
                 in = new FileInputStream(file);
@@ -412,12 +450,14 @@ public class FileHandler{
                 progressFrame.setLocationRelativeTo(null);
                 progressFrame.setVisible(true);
 
+                System.out.println(bytes.length);
+
                 //Start sending file
                 while ((count = in.read(bytes)) > 0) {
 
                     totalSent = totalSent+count;
                     percentageSent = totalSent / length * 100.0;
-
+                    System.out.println("Length: "+bytes.length+" Count: "+count);
                     if(!encr.equals("")){
                         bytes = Encrypter.encrypt(encr, key, bytes);
                     }
@@ -426,8 +466,9 @@ public class FileHandler{
                     progressBar.setValue((int)percentageSent);
                     progressInfo.setText(pInfo+(int)totalSent);
                     progressFrame.repaint();
-
-                    out.write(bytes, 0, count);
+                    System.out.println("Length: "+bytes.length+" Count: "+count);
+                    System.out.println("");
+                    out.write(bytes, 0, bytes.length);
 
                     try{
                         Thread.sleep(50);
