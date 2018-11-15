@@ -25,6 +25,7 @@ public class FileHandler{
     private String encr = "";
     private String key = "";
     private PrintWriter out = null;
+    private byte[] bytes=null;
 
     /**
      * Constructor that maps the file handler to the relevant user
@@ -95,6 +96,15 @@ public class FileHandler{
                 "Message: "+requestMessage+" Accept?</html>", JLabel.CENTER);
         fileInfo.setBounds(50,20,300,80);
 
+        JLabel encryptionInfo= new JLabel("",JLabel.CENTER);
+        if(isEncrypted){
+            System.out.println("isencrypted");
+            encryptionInfo.setText("<html>The file is encrypted with "+encryptionType+"</html>");
+        }
+
+
+        encryptionInfo.setBounds(50,5,300,20);
+
         JLabel messageText = new JLabel("<html>Optional message to accompany request answer: </html>", JLabel.CENTER);
         messageText.setBounds(100,140,200,80);
 
@@ -107,6 +117,7 @@ public class FileHandler{
         decline.setBounds(240,100,60,40);
 
         fileRequestFrame.add(fileInfo);
+        fileRequestFrame.add(encryptionInfo);
         fileRequestFrame.add(accept);
         fileRequestFrame.add(decline);
         fileRequestFrame.add(messageText);
@@ -146,7 +157,7 @@ public class FileHandler{
 
                         try {
                             InputStream in = null;
-                            OutputStream out = null;
+                            OutputSFile tream out = null;
 
                             //Create input and output streams
                             try {
@@ -188,19 +199,22 @@ public class FileHandler{
                                         amountReceived.setText(AMOUNTLABEL+Integer.toString(TMPRECEIVED));
                                         progressFrame.repaint();
 
-                                        if(TMPRECEIVED==TMPFILE){
-                                            progressLabel.setText("Saving file to computer");
+                                        if(TMPRECEIVED>TMPFILE){
+                                            progressLabel.setText("<html>File bigger than anticipated, <br> continuing to downloading</html>");
                                         }
                                     }
                                 });
 
-                                bigBytes = concatenateByteArrays(bigBytes,bytes);
-                                System.out.println(bigBytes.length);
-                                System.out.println(count);
-                                System.out.println(totalReceived)
-                               // if(isEncrypted){
-                               //     bytes = Encrypter.decrypt(encryptionType, encryptionKey, bytes);
-                               // }
+                                if(count!=bytes.length){
+                                    bigBytes = concatenateByteArra(bigBytes,bytes,bigBytes.length,count);
+                                }
+                                else {
+                                    bigBytes = addByteArrays(bigBytes, bytes);
+                                }
+                               /* System.out.println("Big bytes: "+bigBytes.length);
+                                System.out.println("Count: "+count);
+                                System.out.println("Totalreceived:" +totalReceived);
+                                System.out.println("bytes length: "+bytes.length);*/
 
                                 //Write to file
                               //  System.out.println("Length: "+bytes.length+" Count: "+count);
@@ -270,10 +284,17 @@ public class FileHandler{
         });
     }
 
-    public byte[] concatenateByteArrays(byte[] a, byte[] b) {
+    public byte[] addByteArrays(byte[] a, byte[] b) {
         byte[] result = new byte[a.length + b.length];
         System.arraycopy(a, 0, result, 0, a.length);
         System.arraycopy(b, 0, result, a.length, b.length);
+        return result;
+    }
+
+    public byte[] concatenateByteArra(byte[] a, byte[] b, int aLength, int bLength) {
+        byte[] result = new byte[aLength + bLength];
+        System.arraycopy(a, 0, result, 0, aLength);
+        System.arraycopy(b, 0, result, aLength, bLength);
         return result;
     }
 
@@ -296,14 +317,38 @@ public class FileHandler{
         file = inFile;
 
         server = inServer;
-        isRunning = true;
+        setRunningStatus(true);
+        InputStream in=null;
+
+        try {
+            in = new FileInputStream(file);
+        }catch(FileNotFoundException e6){
+            //do something
+        }
+
+        long length = file.length();
+        bytes = new byte[(int)length];
+
+        try {
+            in.read(bytes);
+        }catch(IOException e2){
+            System.out.println("File unavailable, try again");
+        }
+
+        if(!encr.equals("")){
+            bytes = Encrypter.encrypt(encr, key, bytes);
+        }
 
         //Send request message
-        String requestMessage = Composer.composeFileRequest(message, file.getName(), Long.toString(file.length()),
+        String requestMessage = Composer.composeFileRequest(message, file.getName(), Integer.toString(bytes.length),
                 Integer.toString(port), encr, inKey);
 
         messageSocket.send(requestMessage);
-
+        try{
+            in.close();
+        }catch(IOException e4){
+            //do something
+        }
         //Wait for message for 60 seconds
         Thread t = new Thread(username){
             public void run(){
@@ -313,8 +358,9 @@ public class FileHandler{
 
                     //If no answer has been received within 60 seconds
                     if(countDown<=0){
-                        displayQueryError();
                         isRunning = false;
+                        bytes=null;
+                        displayQueryError();
                         try {
                             server.close();
                         }catch(IOException e) {
@@ -324,7 +370,6 @@ public class FileHandler{
                         return;
                     }
                     if(requestAnswered) {
-                        isRunning=false;
                         return;
                     }
 
@@ -379,6 +424,10 @@ public class FileHandler{
         return isRunning;
     }
 
+    public void setRunningStatus(boolean inRunning){
+        isRunning =inRunning;
+    }
+
 
     /**
      * Called when a response is received. Sends file or shut socket down
@@ -393,11 +442,10 @@ public class FileHandler{
 
         String reply = fileResponse.getReply();
         String responseMessage = fileResponse.getMessage();
-        System.out.println(encr);
         //Check if process is still happening
-
+      //  System.out.println(getRunningStatus());
         if(!getRunningStatus()){
-            System.out.println("running status");
+         //   System.out.println("running status");
             return;
         }
         //Send file
@@ -409,7 +457,6 @@ public class FileHandler{
                 //do something
             }
 
-            InputStream in=null;
             OutputStream out= null;
 
             //Create frame and progress bar
@@ -417,7 +464,7 @@ public class FileHandler{
             JProgressBar progressBar = new JProgressBar();
             JLabel userInfo = new JLabel("<html>Response: "+responseMessage+"<br>Sending file to "+ user.getName()+"</html>");
             String pInfo = "Current amout of kb transfered: ";
-            JLabel progressInfo = new JLabel(pInfo);
+            JLabel progressInfo = new JLabel();
             progressBar.setMinimum(0);
             progressBar.setMaximum(100);
             progressFrame.add(userInfo);
@@ -427,14 +474,14 @@ public class FileHandler{
             progressFrame.setSize(300,200);
 
             // Get the size of the file
-            long length = file.length();
-            byte[] bytes = new byte[(int)length];
+           // long length = file.length();
+           // byte[] bytes = new byte[(int)length];
 
-            try {
-                in = new FileInputStream(file);
-            }catch(FileNotFoundException e6){
-                //do something
-            }
+          //  try {
+          //      in = new FileInputStream(file);
+          //  }catch(FileNotFoundException e6){
+          //      //do something
+         //   }
 
             try{
                 out =clientSocket.getOutputStream();
@@ -450,10 +497,45 @@ public class FileHandler{
                 progressFrame.setLocationRelativeTo(null);
                 progressFrame.setVisible(true);
 
-                System.out.println(bytes.length);
+              //  System.out.println(bytes.length);
+               // progressInfo.setText("Reading file");
+               // in.read(bytes);
+
+              //  if(!encr.equals("")){
+             //       bytes = Encrypter.encrypt(encr, key, bytes);
+             //   }
+
+                progressInfo.setText(pInfo);
+
+                double j = 0.0;
+
+                for(int i =0; i<bytes.length;i++){
+                    out.write(bytes,i,1);
+
+                    j=i+1.0;
+                    percentageSent = j / bytes.length * 100.0;
+                   // System.out.println(percentageSent);
+                    if(i%1024==0){
+                        progressBar.setValue((int)percentageSent);
+                        progressInfo.setText(pInfo+(int)j);
+                        progressFrame.repaint();
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e4) {
+                            //do something
+                        }
+                    }
+
+                    if(percentageSent==100){
+                        progressBar.setValue(100);
+
+                    }
+                }
+
+
 
                 //Start sending file
-                while ((count = in.read(bytes)) > 0) {
+             /*   while ((count = in.read(bytes)) > 0) {
 
                     totalSent = totalSent+count;
                     percentageSent = totalSent / length * 100.0;
@@ -475,13 +557,14 @@ public class FileHandler{
                     }catch(InterruptedException e){
                         //do something
                     }
-                }
+                }*/
 
             }catch(IOException e7){
                 //do something
             }
 
             progressInfo.setText("The file has been transfered!");
+
             Thread.sleep(5000);
 
             progressFrame.dispose();
@@ -491,6 +574,7 @@ public class FileHandler{
             try {
                 clientSocket.close();
                 server.close();
+                bytes = null;
             }catch(IOException e) {
                 //do something
             }
@@ -498,6 +582,7 @@ public class FileHandler{
         }else {
             try{
                 server.close();
+                bytes = null;
               //  clientSocket.close();
             }catch(IOException e) {
                 //do something
