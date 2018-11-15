@@ -92,7 +92,6 @@ public class ChatPane extends JPanel {
         /* Disables certain buttons, prevents mistakes */
         if (isMultipartClient) {
             disconnectButton.setEnabled(false);
-            closeButton.setEnabled(false);
             sendFileButton.setEnabled(false);
         }
     }
@@ -115,6 +114,7 @@ public class ChatPane extends JPanel {
 
         /* Disables certain buttons, prevents mistakes */
         disconnectButton.setEnabled(false);
+        closeButton.setEnabled(false);
         sendFileButton.setEnabled(false);
 
         /* Start multipart on all clients also */
@@ -394,8 +394,8 @@ public class ChatPane extends JPanel {
         /* Inform "me" that a new user has been added */
         addMessage(new Message(user + " connected."));
 
-        /* Actually add the user */
-        users.add(user);
+        // /* Actually add the user */
+        // users.add(user);
     }
     
     /**
