@@ -33,7 +33,7 @@ import java.io.IOException;
  * </ul>
  */
 public class Backend {
-    private static final int MAX_CONNECTIONS = 3;
+    private static final int MAX_CONNECTIONS = 5;
 
     private JFrame frame;
     /** The menu bar containing buttons for new connection, disconnect, change name */
