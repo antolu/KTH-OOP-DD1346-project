@@ -128,7 +128,10 @@ public class ChatPane extends JPanel {
      * Creates the chat window, and all the relevant buttons.
      */
     private void createGUI() {
-        chatWindow = new ChatWindow(users.get(0).getName());
+        if (!isMultipartClient && !isMultipartServer)
+            chatWindow = new ChatWindow(users.get(0).getName());
+        else
+            chatWindow = new ChatWindow("");
         scrollPane = new JScrollPane(chatWindow);
         msgField = new JTextField();
 
