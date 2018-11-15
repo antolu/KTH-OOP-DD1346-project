@@ -108,7 +108,7 @@ public class KeyRequestChooser extends JPanel implements ActionListener {
             for (JRadioButton button : radioButtons) {
                 if (button.isSelected()) {
 
-                    type = button.getText();
+                    type = button.getText().toLowerCase();
                     sendMessage=messageField.getText();
 
                     frame.setVisible(false);
