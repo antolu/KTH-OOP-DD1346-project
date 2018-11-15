@@ -116,6 +116,7 @@ public class ChatPane extends JPanel {
         disconnectButton.setEnabled(false);
         closeButton.setEnabled(false);
         sendFileButton.setEnabled(false);
+        keyRequest.setEnabled(false);
 
         /* Start multipart on all clients also */
         for (User user : users) {
