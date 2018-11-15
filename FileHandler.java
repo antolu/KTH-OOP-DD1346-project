@@ -157,7 +157,7 @@ public class FileHandler{
 
                         try {
                             InputStream in = null;
-                            OutputSFile tream out = null;
+                            OutputStream out = null;
 
                             //Create input and output streams
                             try {
