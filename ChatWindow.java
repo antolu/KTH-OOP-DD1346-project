@@ -31,9 +31,6 @@ public class ChatWindow extends JEditorPane {
     private Transformer transformer;
     private String name;
 
-    /** A list of all the received messages */
-    private List<Message> messages;
-
     /**
      * Creates the initial view when another person connects.
      * @param name The name of the other user
