@@ -9,7 +9,7 @@ public class KeyRequestResponse extends Query {
      * @param key The key of the encryption type queried.
      */
     public KeyRequestResponse(String key) {
-        super("KeyRequestResponse");
+        super("KeyResponse");
         this.key = key;
     }
 
