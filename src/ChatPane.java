@@ -280,7 +280,7 @@ public class ChatPane extends JPanel {
 
                         String encrKey="";
 
-                        if(!currentEncryptionType.equals("")) {
+                        if(!currentEncryptionType.equals("") && encryptButton.getState()) {
                             encrKey=encryptionKeys.get(currentEncryptionType);
                         }
                         //Choose file
