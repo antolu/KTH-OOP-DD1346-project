@@ -49,29 +49,29 @@ public class Main {
         // }
 
 
-        //new StartFrame();
+        new StartFrame();
 
-        if (args.length < 2) 
-            System.exit(1);
-        String name = args[0];
-        int port = 0;
-        try {
-            port = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            System.exit(1);
-        }
+        // if (args.length < 2) 
+        //     System.exit(1);
+        // String name = args[0];
+        // int port = 0;
+        // try {
+        //     port = Integer.parseInt(args[1]);
+        // } catch (NumberFormatException e) {
+        //     System.exit(1);
+        // }
 
-        /* Socket */
-        ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(port);
-        }
-        catch (IOException e) {
-            System.err.println("Failed to bind to port");
-            System.exit(1);
-        }
+        // /* Socket */
+        // ServerSocket serverSocket = null;
+        // try {
+        //     serverSocket = new ServerSocket(port);
+        // }
+        // catch (IOException e) {
+        //     System.err.println("Failed to bind to port");
+        //     System.exit(1);
+        // }
 
-        new Backend(port, name, serverSocket);
+        // new Backend(port, name, serverSocket);
 
 
         // String message = getMessage();
