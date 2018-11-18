@@ -92,7 +92,6 @@ public class ChatPane extends JPanel {
         /* Disables certain buttons, prevents mistakes */
         if (isMultipartClient) {
             disconnectButton.setEnabled(false);
-            closeButton.setEnabled(false);
             sendFileButton.setEnabled(false);
         }
     }
@@ -117,6 +116,7 @@ public class ChatPane extends JPanel {
         disconnectButton.setEnabled(false);
         closeButton.setEnabled(false);
         sendFileButton.setEnabled(false);
+        keyRequest.setEnabled(false);
 
         /* Start multipart on all clients also */
         for (User user : users) {
@@ -128,7 +128,10 @@ public class ChatPane extends JPanel {
      * Creates the chat window, and all the relevant buttons.
      */
     private void createGUI() {
-        chatWindow = new ChatWindow(users.get(0).getName());
+        if (!isMultipartClient && !isMultipartServer)
+            chatWindow = new ChatWindow(users.get(0).getName());
+        else
+            chatWindow = new ChatWindow("");
         scrollPane = new JScrollPane(chatWindow);
         msgField = new JTextField();
 
@@ -395,8 +398,8 @@ public class ChatPane extends JPanel {
         /* Inform "me" that a new user has been added */
         addMessage(new Message(user + " connected."));
 
-        /* Actually add the user */
-        users.add(user);
+        // /* Actually add the user */
+        // users.add(user);
     }
     
     /**

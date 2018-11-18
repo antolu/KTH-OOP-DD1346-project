@@ -93,12 +93,12 @@ public class Transcriber {
             Element message = doc.getDocumentElement();
             /* If message starts with <message> */
             if (message.getTagName() == "message") {
-                /* If message starts with <message><text ...> */
-                if (((Element) message.getChildNodes().item(0)).getTagName().equals("text"))
-                    return parseMessage(doc, message);
                 /* If message starts with <message multipart=start> */
-                else if (message.getAttribute("multipart").equals("start"))
+                if (message.getAttribute("multipart").equals("start"))
                     return new Query("<multipartstart />");
+                /* If message starts with <message><text ...> */
+                else if (((Element) message.getChildNodes().item(0)).getTagName().equals("text"))
+                    return parseMessage(doc, message);
                 /* If message starts with <message><filerequest ...> */
                 else if (((Element) message.getChildNodes().item(0)).getTagName().equals("filerequest"))
                     return parseFileRequest((Element) message.getChildNodes().item(0), socket);
