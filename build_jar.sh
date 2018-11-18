@@ -17,7 +17,7 @@ mkdir jar-build
 mkdir jar-build/main
 mkdir jar-build/lib
 cp ./lib/*.jar jar-build/lib/
-cp chat.jar ./jar-build/main
+mv chat.jar ./jar-build/main
 
 # Extract jar
 unzip ./lib/one-jar-appgen-0.97.jar -d ./jar-build/
