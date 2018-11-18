@@ -279,12 +279,17 @@ public class ChatPane extends JPanel {
                     public void run(){
 
                         String encrKey="";
+                        System.out.println(encryptButton.getState());
 
-                        if(!currentEncryptionType.equals("")) {
+                        if(!currentEncryptionType.equals("") && encryptButton.getState()) {
                             encrKey=encryptionKeys.get(currentEncryptionType);
+                            new FileChooser(currentEncryptionType, encrKey, users, fileHandler);
+
+                        }
+                        else{
+                            new FileChooser("", "", users, fileHandler);
                         }
                         //Choose file
-                        new FileChooser(currentEncryptionType, encrKey, users, fileHandler);
                     }
                 });
             }
