@@ -1,14 +1,10 @@
 # DD1346-project
 oopk17-project
 
-Compile code with 
+Compile an executable jar with 
+
 ```
-javac -cp .:commons-text.jar:javax.xml.bind.jar *.java
+bash ./build_jar.sh
 ```
 
-Add flag `--release 8` to compile with Java 8 compatible compiler
-
-Generate executable JAR-file with
-```
-jar cfm <jar name>.jar Manifest.txt *.class layout *.jar
-```
+And run it as usual through console or double-click.
