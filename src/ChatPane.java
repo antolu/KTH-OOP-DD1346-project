@@ -93,6 +93,7 @@ public class ChatPane extends JPanel {
         if (isMultipartClient) {
             disconnectButton.setEnabled(false);
             sendFileButton.setEnabled(false);
+            keyRequest.setEnabled(false);
         }
     }
 
@@ -289,7 +290,6 @@ public class ChatPane extends JPanel {
                         else{
                             new FileChooser("", "", users, fileHandler);
                         }
-                        //Choose file
                     }
                 });
             }
@@ -463,6 +463,7 @@ public class ChatPane extends JPanel {
      * @return The corresponding key.
      */
     public String getPublicKey(String type) {
+        System.out.println(type);
         return encryptionKeys.get(type);
     }
 
