@@ -109,6 +109,10 @@ public class KeyRequestChooser extends JPanel implements ActionListener {
                 if (button.isSelected()) {
 
                     type = button.getText().toLowerCase();
+
+                    if(type.equals("aes")){
+                        type="AES";
+                    }
                     sendMessage=messageField.getText();
 
                     frame.setVisible(false);
