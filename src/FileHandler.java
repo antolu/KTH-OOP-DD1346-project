@@ -18,13 +18,12 @@ public class FileHandler{
     private static volatile boolean isRunning=false;
     private volatile boolean requestAnswered=false;
     private ServerSocket server=null;
-    private static Socket mySocket = null;
+    private static Socket socket = null;
     private static SocketClient socketClient= null;
     private File file=null;
     private static User user = null;
     private String encr = "";
     private String key = "";
-    private PrintWriter out = null;
     private byte[] bytes=null;
 
     /**
@@ -72,14 +71,9 @@ public class FileHandler{
         boolean isEncrypted = fileRequest.isEncrypted();
         System.out.println("Encryption: "+encryptionType+" "+encryptionKey+" is encrypted: "+isEncrypted);
 
-       /* if(host.contains("localhost")){
-            host="localhost";
-        }*/
-
-
         //Creates a socket to communicate through
         try{
-            mySocket = new Socket(host,port);
+            socket = new Socket(host,port);
         }catch(IOException e){
             //do something
             System.out.println("Could not connect to port");
@@ -161,7 +155,7 @@ public class FileHandler{
 
                             //Create input and output streams
                             try {
-                                in = mySocket.getInputStream();
+                                in = socket.getInputStream();
                                 System.out.println("Accept action listener: client created");
                             } catch (IOException ex) {
                                 System.out.println("Can't get socket input stream. ");
@@ -206,7 +200,7 @@ public class FileHandler{
                                 });
 
                                 if(count!=bytes.length){
-                                    bigBytes = concatenateByteArra(bigBytes,bytes,bigBytes.length,count);
+                                    bigBytes = concentrateByteArrays(bigBytes,bytes,bigBytes.length,count);
                                 }
                                 else {
                                     bigBytes = addByteArrays(bigBytes, bytes);
@@ -238,7 +232,7 @@ public class FileHandler{
                                     isRunning = false;
 
                                     try{
-                                        mySocket.close();
+                                        socket.close();
                                     }catch(IOException e1){
                                         //do something
                                     }
@@ -261,7 +255,7 @@ public class FileHandler{
                 fileRequestFrame.dispose();
 
                 try{
-                    mySocket.close();
+                    socket.close();
                 }catch(IOException e1) {
                     //do something
                 }
@@ -270,7 +264,7 @@ public class FileHandler{
             }
         });
     }
-
+    //Remove and work into concentrateByteArray
     public byte[] addByteArrays(byte[] a, byte[] b) {
         byte[] result = new byte[a.length + b.length];
         System.arraycopy(a, 0, result, 0, a.length);
@@ -278,7 +272,7 @@ public class FileHandler{
         return result;
     }
 
-    public byte[] concatenateByteArra(byte[] a, byte[] b, int aLength, int bLength) {
+    public byte[] concentrateByteArrays(byte[] a, byte[] b, int aLength, int bLength) {
         byte[] result = new byte[aLength + bLength];
         System.arraycopy(a, 0, result, 0, aLength);
         System.arraycopy(b, 0, result, aLength, bLength);
@@ -310,7 +304,8 @@ public class FileHandler{
         try {
             in = new FileInputStream(file);
         }catch(FileNotFoundException e6){
-            //do something
+            System.out.println("did not manage to create input stream");
+            return;
         }
 
         long length = file.length();
@@ -320,6 +315,7 @@ public class FileHandler{
             in.read(bytes);
         }catch(IOException e2){
             System.out.println("File unavailable, try again");
+            return;
         }
 
         if(!encr.equals("")){
@@ -429,10 +425,8 @@ public class FileHandler{
 
         String reply = fileResponse.getReply();
         String responseMessage = fileResponse.getMessage();
-        //Check if process is still happening
-      //  System.out.println(getRunningStatus());
+        //Check if process is still running
         if(!getRunningStatus()){
-         //   System.out.println("running status");
             return;
         }
         //Send file
@@ -473,11 +467,6 @@ public class FileHandler{
             try{
                 progressFrame.setLocationRelativeTo(null);
                 progressFrame.setVisible(true);
-
-              //  if(!encr.equals("")){
-             //       bytes = Encrypter.encrypt(encr, key, bytes);
-             //   }
-
                 progressInfo.setText(pInfo);
 
                 double j = 0.0;
@@ -505,28 +494,6 @@ public class FileHandler{
                     }
                 }
 
-                //Start sending file
-             /*   while ((count = in.read(bytes)) > 0) {
-
-                    totalSent = totalSent+count;
-                    percentageSent = totalSent / length * 100.0;
-                    if(!encr.equals("")){
-                        bytes = Encrypter.encrypt(encr, key, bytes);
-                    }
-
-                    //Update progress bar
-                    progressBar.setValue((int)percentageSent);
-                    progressInfo.setText(pInfo+(int)totalSent);
-                    progressFrame.repaint();
-                    out.write(bytes, 0, bytes.length);
-
-                    try{
-                        Thread.sleep(50);
-                    }catch(InterruptedException e){
-                        //do something
-                    }
-                }*/
-
             }catch(IOException e7){
                 //do something
             }
@@ -553,7 +520,7 @@ public class FileHandler{
                 bytes = null;
               //  clientSocket.close();
             }catch(IOException e) {
-                //do something
+                System.out.println("can't close socket");
             }
 
             //Create decline-window
