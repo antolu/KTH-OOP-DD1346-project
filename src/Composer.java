@@ -259,11 +259,11 @@ public class Composer {
         sb.append("<message>");
 
         /* <keyrequest> */
-        sb.append("<keyrequest key=\"");
+        sb.append("<keyresponse key=\"");
         sb.append(key);
         sb.append("\"");
         sb.append(">");
-        sb.append("</keyrequest>");
+        sb.append("</keyresponse>");
 
         sb.append("</message>");
 
